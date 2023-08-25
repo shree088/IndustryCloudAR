@@ -29,12 +29,6 @@
                 android:layout_height="wrap_content"
                 android:text="@string/back"
                 android:onClick="OnBackClicked"/>
-            <Button
-                android:id="@+id/codelete"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="delete"
-                android:onClick="OnDeleteClicked"/>
 
             <Space
                 android:layout_width="0dp"
@@ -45,13 +39,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/sensor_status"/>
-            <TextView
-            android:id="@+id/anchorText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-           
-            android:text="AnchorsFound:"
-            android:textColor="@android:color/holo_orange_light" />
 
         </LinearLayout>
 

@@ -1,15 +1,15 @@
 <resources>
-  <string name="app_name">Sample Xamarin Android</string>
+  <string name="app_name">Neudesic Industry Cloud</string>
   <string name="title_activity_aractive">ARActive</string>
-  <string name="main_title_text">Select a Spatial Anchors Demo</string>
+  <string name="main_title_text">Neudesic Industry Cloud Demo</string>
   <string name="main_basic_button_text">Basic</string>
   <string name="main_basic_details_text">Create and locate and anchor.</string>
   <string name="main_nearby_button_text">Nearby</string>
   <string name="main_nearby_details_text">Create 3 anchors and locate the last. Then, find the other 2 anchors using a query for nearby anchors.</string>
   <string name="main_shared_button_text">Shared</string>
   <string name="main_shared_details_text">Create and locate anchors between multiple devices by using a server to broadcast anchor IDs.</string>
-  <string name="main_coarse_reloc_button_text">Coarse Reloc</string>
-  <string name="main_coarse_reloc_details_text">Create and locate anchors between multiple devices by placing them in the real world.</string>
+  <string name="main_coarse_reloc_button_text">Start Demo</string>
+  <string name="main_coarse_reloc_details_text">Create an real Oil Rig using AR and monitor health from real telemetry</string>
   <string name="shared_title_text">Welcome to the Azure Spatial Anchors Shared Anchors Demo\nChoose Create or Locate</string>
   <string name="shared_enter_anchor_text">Enter Anchor Number:</string>
   <string name="shared_anchor_number_text">Anchor Number</string>
@@ -18,12 +18,12 @@
   <string name="locate_button_text">Locate</string>
   <string name="create_anchor">Create Anchor</string>
   <string name="start_watcher">Start Watcher</string>
-  <string name="add_anchor">Add Anchor</string>
+  <string name="add_anchor">Place OilRig Model</string>
   <string name="geolocation_status">GeoLocation: </string>
   <string name="wifi_status">Wi-Fi: </string>
   <string name="bluetooth_status">Bluetooth: </string>
   <string name="stop_watcher">Stop Watcher</string>
-  <string name="confirm_placement">Confirm Placement</string>
+  <string name="confirm_placement">Sync Telemetry</string>
   <string name="required_scan_progress">Required scan progress:</string>
   <string name="recommended_scan_progress">Recommended scan progress:</string>
   <string name="hint_scan_for_anchors">💡 Move around to look for anchors</string>
@@ -32,4 +32,6 @@
   <string name="hint_scan_for_creation">💡 Look around the anchor to scan the environment.</string>
   <string name="back">Back</string>
   <string name="large_circle">⬤</string>
+  <string name="ModelText">Neudesic IC Demo</string>
+  <string name="place_model">Place Model</string>
 </resources>

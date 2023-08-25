@@ -9,6 +9,7 @@ using Android.Widget;
 using Google.AR.Core;
 using Google.AR.Sceneform.UX;
 using System;
+using System.Threading;
 using static Android.Views.View;
 using static Android.Widget.RadioGroup;
 using static Google.AR.Sceneform.UX.BaseArFragment;
@@ -23,9 +24,10 @@ namespace SampleXamarin
         private AnchorVisual visual;
 
         private TextView hintText;
-        private Button confirmPlacementButton;
+        private Button syncTelemetryButton;
         private RadioGroup shapeSelection;
-
+        private LinearLayout selectLayout;
+        private Timer timer;
         private AnchorVisual.NamedShape SelectedShape
         {
             get
@@ -70,17 +72,19 @@ namespace SampleXamarin
             base.OnViewCreated(view, savedInstanceState);
 
             hintText = view.FindViewById<TextView>(Resource.Id.hint_text);
-            confirmPlacementButton = view.FindViewById<Button>(Resource.Id.confirm_placement);
+            syncTelemetryButton = view.FindViewById<Button>(Resource.Id.confirm_placement);
             shapeSelection = view.FindViewById<RadioGroup>(Resource.Id.shape_selection);
+            selectLayout = view.FindViewById<LinearLayout>(Resource.Id.co_select_layout);
         }
 
         public override void OnStart()
         {
             base.OnStart();
 
-            confirmPlacementButton.Enabled = false;
+            syncTelemetryButton.Enabled = false;
+            selectLayout.Visibility = ViewStates.Invisible;
             arFragment.SetOnTapArPlaneListener(this);
-            confirmPlacementButton.SetOnClickListener(this);
+            syncTelemetryButton.SetOnClickListener(this);
             shapeSelection.SetOnCheckedChangeListener(this);
         }
 
@@ -90,10 +94,17 @@ namespace SampleXamarin
 
             if (visual != null)
             {
+                visual.StopAudio();
+                visual.ModelLoaded -= Visual_ModelLoaded;
                 visual.Destroy();
                 visual = null;
-            }
 
+            }
+            if(timer != null)
+            {
+                timer.Dispose();
+            }
+           
             base.OnStop();
         }
 
@@ -101,8 +112,7 @@ namespace SampleXamarin
         {
             if (visual != null)
             {
-                visual.Destroy();
-                visual = null;
+                return;
             }
 
             Anchor localAnchor = hitResult.CreateAnchor();
@@ -111,10 +121,14 @@ namespace SampleXamarin
             visual.Shape = SelectedShape;
             visual.SetColor(arFragment.Context, Color.Yellow);
             visual.AddToScene(arFragment);
-
+            visual.ModelLoaded += Visual_ModelLoaded;
             hintText.SetText(Resource.String.hint_adjust_anchor);
 
-            confirmPlacementButton.Enabled = true;
+        }
+
+        private void Visual_ModelLoaded(object sender, bool e)
+        {
+            syncTelemetryButton.Enabled = true;
         }
 
         void IOnCheckedChangeListener.OnCheckedChanged(RadioGroup radioGroup, int selectedId)
@@ -131,11 +145,25 @@ namespace SampleXamarin
         {
             if (visual != null)
             {
-                AnchorVisual placedAnchor = visual;
-                visual = null;
-                placedAnchor.IsMovable = false;
-                OnAnchorPlaced?.Invoke(placedAnchor);
+                syncTelemetryButton.Enabled = false;
+                visual.Fetch_LoadTelemetry();
+                syncTelemetryButton.Enabled = true;
+                timer = new Timer(TimerCallback, null, TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(20));
+                //AnchorVisual placedAnchor = visual;
+                //visual = null;
+                //placedAnchor.IsMovable = false;
+                //OnAnchorPlaced?.Invoke(placedAnchor);
             }
+        }
+
+        private void TimerCallback(object state)
+        {
+            Console.WriteLine($"Timer callback executed at: {DateTime.Now}");
+            if (visual != null)
+            {
+                visual.Fetch_LoadTelemetry();
+            }
+            
         }
     }
 }

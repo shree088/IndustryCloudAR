@@ -76,7 +76,7 @@ namespace SampleXamarin
             {
                 NearDevice = new NearDeviceCriteria
                 {
-                    DistanceInMeters = 200.0f,
+                    DistanceInMeters = 8.0f,
                     MaxResultCount = 25
                 }
             });

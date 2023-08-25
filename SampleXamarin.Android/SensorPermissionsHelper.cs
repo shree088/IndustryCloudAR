@@ -35,9 +35,8 @@ namespace SampleXamarin
                         Manifest.Permission.AccessFineLocation,
                         Manifest.Permission.AccessWifiState,
                         Manifest.Permission.ChangeWifiState,
-                        //Manifest.Permission.Bluetooth,
-                        //Manifest.Permission.BluetoothAdmin'
-                        },
+                        Manifest.Permission.Bluetooth,
+                        Manifest.Permission.BluetoothAdmin},
                     RequestCodeAllSensors);
 
             return HasAllRequiredPermissionGranted(activity);
@@ -79,7 +78,7 @@ namespace SampleXamarin
             bool isBluetoothAllowed = hasAnyLocationPermission
                     && hasBluetoothPermission
                     && hasBluetoothAdminPermission;
-            bool isBluetoothOn = isBluetoothAllowed;
+            bool isBluetoothOn = isBluetoothAllowed && TryTurnOnBluetooth();
 
             // Configure location provider to use the allowed sensors
             var sensors = locationProvider.Sensors;

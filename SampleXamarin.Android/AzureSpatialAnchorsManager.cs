@@ -36,6 +36,7 @@ namespace SampleXamarin
 
         public event EventHandler<SessionUpdatedEvent> OnSessionUpdated;
 
+
         static AzureSpatialAnchorsManager()
         {
             CloudServices.Initialize(Android.App.Application.Context);

@@ -11,7 +11,7 @@ namespace SampleXamarin
         /// <remarks>
         /// Set this to your account id found in the Azure Portal.
         /// </remarks>
-        public const string SpatialAnchorsAccountId = "8f28ecdc-790c-41b4-9bab-ef5be9b31050";
+        public const string SpatialAnchorsAccountId = "2b0bae5b-3e27-42a6-a05b-4fd045803c01";
 
         /// <summary>
         /// The Azure Spatial Anchors account key.
@@ -20,7 +20,7 @@ namespace SampleXamarin
         /// <remarks>
         /// Set this to your account key found in the Azure Portal.
         /// </remarks>
-        public const string SpatialAnchorsAccountKey = "yPqcq/vWarKfyw28bwjrNTwdM7BOzDxy8OFd4BDHffA=";
+        public const string SpatialAnchorsAccountKey = "6x8DhDFxAvH8ilCutUp8WopcyuGJB25LhlmOF2KbY6s=";
 
         /// <summary>
         /// The Azure Spatial Anchors account domain.
@@ -29,7 +29,7 @@ namespace SampleXamarin
         /// <remarks>
         /// Set this to your account domain found in the Azure Portal.
         /// </remarks>
-        public const string SpatialAnchorsAccountDomain = "eastus.mixedreality.azure.com";
+        public const string SpatialAnchorsAccountDomain = "southeastasia.mixedreality.azure.com";
 
         /// <summary>
         /// The full URL endpoint of the anchor sharing service.

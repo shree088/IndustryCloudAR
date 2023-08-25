@@ -25,8 +25,6 @@ namespace SampleXamarin
         private ArFragment arFragment;
         private ArSceneView sceneView;
         private SensorStatusView sensorStatusView;
-        private TextView anchorText;
-        private int numberofAnchorsFound = 0;
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
         {
@@ -60,9 +58,6 @@ namespace SampleXamarin
             sceneView = arFragment.ArSceneView;
 
             sensorStatusView = FindViewById<SensorStatusView>(Resource.Id.sensor_status);
-            anchorText = FindViewById<TextView>(Resource.Id.anchorText);
-            numberofAnchorsFound = 0;
-            anchorText.Text = numberofAnchorsFound.ToString();
 
             Scene scene = sceneView.Scene;
             scene.Update += (_, args) =>
@@ -104,15 +99,14 @@ namespace SampleXamarin
                 Finish();
                 return;
             }
-            numberofAnchorsFound = 0;
-            anchorText.Text = numberofAnchorsFound.ToString();
+
             SensorPermissionsHelper.RequestMissingPermissions(this);
 
             cloudAnchorManager = new AzureSpatialAnchorsManager(sceneView.Session);
             cloudAnchorManager.StartSession();
 
             locationProvider = new PlatformLocationProvider();
-           // locationProvider.Sensors.SetKnownBeaconProximityUuids(CoarseRelocSettings.KnownBluetoothProximityUuids);
+            locationProvider.Sensors.SetKnownBeaconProximityUuids(CoarseRelocSettings.KnownBluetoothProximityUuids);
             SensorPermissionsHelper.EnableAllowedSensors(this, locationProvider);
             cloudAnchorManager.LocationProvider = locationProvider;
 
@@ -177,7 +171,7 @@ namespace SampleXamarin
             watcherFragment.OnAnchorDiscovered = OnAnchorDiscovered;
             FragmentHelper.PushFragment(this, watcherFragment);
         }
-        List<AnchorVisual> anchors = new List<AnchorVisual>();
+
         public void OnAnchorDiscovered(CloudSpatialAnchor cloudAnchor)
         {
             AnchorVisual visual = new AnchorVisual(arFragment, cloudAnchor);
@@ -190,10 +184,7 @@ namespace SampleXamarin
                     visual.Shape = savedShape;
                 }
             }
-            numberofAnchorsFound++;
-            anchorText.Text = numberofAnchorsFound.ToString();
             visual.AddToScene(arFragment);
-           anchors.Add(visual);
         }
 
         [Export("OnBackClicked")]
@@ -203,17 +194,6 @@ namespace SampleXamarin
             {
                 Finish();
             }
-        }
-
-        [Export("OnDeleteClicked")]
-        public void OnDeleteClicked(View view)
-        {
-            foreach (AnchorVisual toDeleteVisual in this.anchors)
-            {
-                this.cloudAnchorManager.DeleteAnchorAsync(toDeleteVisual.CloudAnchor);
-                numberofAnchorsFound--;
-            }
-            anchorText.Text = numberofAnchorsFound.ToString();
         }
     }
 }
