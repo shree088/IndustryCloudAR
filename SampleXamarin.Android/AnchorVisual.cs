@@ -431,7 +431,7 @@ namespace SampleXamarin
         {
             transformableTextNodePre = new TransformableNode(arFragment.TransformationSystem);
             transformableTextNodePre.TranslationController.Enabled = true;
-            transformableTextNodePre.TranslationController.TransformableNode.LocalPosition = new Vector3(1.1f, 2.6f, -0.2f);
+            transformableTextNodePre.TranslationController.TransformableNode.LocalPosition = new Vector3(0.8f, 2.6f, -0.2f);
             transformableTextNodePre.ScaleController.Enabled = true;
             transformableTextNodePre.ScaleController.TransformableNode.LocalScale = new Vector3(3.0f, 3.0f, 3.0f);
             transformableTextNodePre.SetParent(AnchorNode);
