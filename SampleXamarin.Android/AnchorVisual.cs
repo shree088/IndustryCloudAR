@@ -497,7 +497,7 @@ namespace SampleXamarin
             {
                 transformableTextNodePre.Renderable = model;
                 TextView textView = (TextView)model.View;
-                textView.SetText("Asset : kb1.001.pressure" + "\n" + telimetry.Property + ":" + telimetry.Value.ToString(), TextView.BufferType.Normal);
+                textView.SetText("Asset : kb1.001.pressure" + "\n" + "pressure" + ":" + telimetry.Value.ToString(), TextView.BufferType.Normal);
                 textView.SetBackgroundResource(Resource.Drawable.yellowr);
                 this.transformableNode.AddChild(transformableTextNodePre);
             }
