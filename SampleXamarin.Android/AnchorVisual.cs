@@ -96,9 +96,12 @@ namespace SampleXamarin
         }
 
         private TransformableNode transformableNode;
-
-        private TransformableNode transformableTextNode;
+        private TransformableNode transformableTextNodeDep;
+        private TransformableNode transformableTextNodeGas;
+        private TransformableNode transformableTextNodePre;
+        private TransformableNode transformableTextNodeFlo;
         private TransformableNode transformableGifNode;
+
         private NamedShape shape = NamedShape.Sphere;
         private Material material;
         private ArFragment fragment;
@@ -109,47 +112,22 @@ namespace SampleXamarin
         public static Dictionary<int, Material> solidColorInitialMaterialCache = new Dictionary<int, Material>();
         public event EventHandler<bool> ModelLoaded;
         public MediaPlayer mediaPlayer;
-
-        //public AnchorVisual(ArFragment arFragment, Anchor localAnchor, FragmentActivity activity)
-        //{
-        //    this.fragment=arFragment;
-        //    AnchorNode = new AnchorNode(localAnchor);
-
-        //    transformableNode = new TransformableNode(arFragment.TransformationSystem);
-        //    transformableNode.ScaleController.Enabled = false;
-        //    transformableNode.TranslationController.Enabled = false;
-        //    transformableNode.RotationController.Enabled = false;
-        //    transformableNode.SetParent(AnchorNode);
-        //}
+        List<DeviceTelemetry> deviceTelemetries;
 
         public AnchorVisual(ArFragment arFragment, Anchor localAnchor)
         {
             this.fragment = arFragment;
             AnchorNode = new AnchorNode(localAnchor);
-    
+
             transformableNode = new TransformableNode(arFragment.TransformationSystem);
             transformableNode.ScaleController.Enabled = true;
             transformableNode.ScaleController.MinScale = 0.3f;
             transformableNode.ScaleController.MaxScale = 0.7f;
             transformableNode.ScaleController.TransformableNode.LocalScale = new Vector3(0.5f, 0.5f, 0.5f);
-            transformableNode.TranslationController.Dispose(); 
+            transformableNode.TranslationController.Dispose();
             transformableNode.RotationController.Enabled = false;
             transformableNode.SetParent(AnchorNode);
-
-            
-        
-
-
-            transformableTextNode = new TransformableNode(arFragment.TransformationSystem);
-            transformableTextNode.TranslationController.Enabled = true;
-            transformableTextNode.TranslationController.TransformableNode.LocalPosition = new Vector3(0.0f, 0.5f, 0.3f);
-
-            transformableTextNode.ScaleController.Enabled = true;
-            transformableTextNode.ScaleController.TransformableNode.LocalScale = new Vector3(3.0f, 3.0f, 3.0f);
-            //transformableTextNode.TranslationController.Enabled = false;
-            //transformableTextNode.RotationController.Enabled = false;
-            transformableTextNode.SetParent(AnchorNode);
-
+          
             transformableGifNode = new TransformableNode(arFragment.TransformationSystem);
             transformableGifNode.TranslationController.Enabled = true;
             transformableGifNode.TranslationController.TransformableNode.LocalPosition = new Vector3(0.0f, 0.8f, 0.3f);
@@ -158,10 +136,12 @@ namespace SampleXamarin
             transformableGifNode.ScaleController.MaxScale = 0.4f;
             transformableGifNode.ScaleController.TransformableNode.LocalScale = new Vector3(0.1f, 0.1f, 0.1f);
             transformableGifNode.SetParent(AnchorNode);
+            transformableNode.AddChild(transformableGifNode);
 
             this.mediaPlayer = MediaPlayer.Create(this.fragment.Context, Resource.Raw.hazard_alarm);
 
         }
+
         public AnchorVisual(ArFragment arFragment, CloudSpatialAnchor cloudAnchor)
             : this(arFragment, cloudAnchor.LocalAnchor)
         {
@@ -286,71 +266,7 @@ namespace SampleXamarin
             {
 
                 LoadGlb();
-                LoadText();
-                
-
-                //string packageName = Application.Context.PackageName;
-                //var builder = ModelRenderable.InvokeBuilder();
-                //var javaClass = Java.Lang.Class.FromType(builder.GetType());
-                //var methods = javaClass.GetMethods();
-                //var method = methods[11]; // setSource metho
-                //method.Invoke(builder, this.fragment.Context, Resource.Raw.andy);
-                //builder.Build(FinishLoading);
-
-
-
-                //        int resourceId = Resource.Raw.traffic_cones; // Replace with the resource ID of your file
-                //        string packageName = Application.Context.PackageName;
-
-                //        var model = RenderableSource
-                //.InvokeBuilder()
-                //.SetSource(this.fragment.Context, Android.Net.Uri.Parse($"android.resource://{packageName}/{resourceId}"), RenderableSource.SourceType.Glb) // Or .gltf
-                //.Build();
-                //        
-                //        var method1 = methods[13];
-                //        method1.Invoke(builder, this.fragment.Context, model);
-
-                //switch (shape)
-                //{
-                //    case NamedShape.Sphere:
-                //        renderable = ShapeFactory.MakeSphere(
-                //                0.1f,
-                //                new Vector3(0.0f, 0.1f, 0.0f),
-                //                material);
-                //        transformableNode.Renderable = renderable;
-                //        break;
-                //    case NamedShape.Cube:
-                //        renderable = ShapeFactory.MakeCube(
-                //                new Vector3(0.161f, 0.161f, 0.161f),
-                //                new Vector3(0.0f, 0.0805f, 0.0f),
-                //                material);
-                //        transformableNode.Renderable = renderable;
-                //        break;
-                //    case NamedShape.Cylinder:
-                //        //renderable = ShapeFactory.MakeCylinder(
-                //        //        0.0874f,
-                //        //        0.175f,
-                //        //        new Vector3(0.0f, 0.0875f, 0.0f),
-                //        //        material);
-                //        //ModelRenderable.Builder builder = ModelRenderable.InvokeBuilder();
-                //        //builder.SetSource(this.fragment.Activity, Resource.Raw.chair); // Replace 'your_model' with the actual resource ID of your SFB model
-                //        //builder.Build().ThenAccept(new ModelRenderableLoadedCallback(transformableNode));
-
-                //        //var builder = ModelRenderable.InvokeBuilder();
-                //        //builder.SetSource(this.fragment.Context, Resource.Raw.chair);
-                //        //builder.Build().ThenAccept(new FutureResultConsumer<ModelRenderable>(FinishLoading));
-                //        var builder = ModelRenderable.InvokeBuilder();
-                //        var javaClass = Java.Lang.Class.FromType(builder.GetType());
-                //        var methods = javaClass.GetMethods();
-                //        var method = methods[11]; // setSource method
-
-                //        method.Invoke(builder, this.fragment.Context, Resource.Raw.andy);
-                //        builder.Build(FinishLoading);
-                //        break;
-                //    default:
-                //        throw new InvalidOperationException("Invalid shape");
-                //}
-
+                //LoadText(); 
             }
         }
 
@@ -365,7 +281,6 @@ namespace SampleXamarin
            // this.StartPlayer("//android_asset/hazard-alarm.mp3");
             this.ModelLoaded?.Invoke(this, true);
         }
-
 
         private void ApplyColorToChildNodes(Node parentNode, int rgb)
         {
@@ -396,13 +311,6 @@ namespace SampleXamarin
             //}
         }
 
-        private void FinishLoadingText(ViewRenderable model)
-        {
-            transformableTextNode.Renderable = model;
-            TextView textView = (TextView)model.View;
-            textView.SetText(Resource.String.ModelText, TextView.BufferType.Normal);
-        }
-
         private void FinishLoadingGIF(ViewRenderable model)
         {
             transformableGifNode.Renderable = model;
@@ -428,30 +336,34 @@ namespace SampleXamarin
                     {
                         string content =  response.Content.ReadAsStringAsync().Result;
                         System.Console.WriteLine(content);
-                        List<DeviceTelemetry> deviceTelemetries = JsonConvert.DeserializeObject<List<DeviceTelemetry>>(content);
+                        deviceTelemetries = JsonConvert.DeserializeObject<List<DeviceTelemetry>>(content);
                         bool isAnomalyFound = deviceTelemetries.Any((x) => x.ColorValue != 0);
                         foreach (var deviceTelemetry in deviceTelemetries)
                         {
                             if (deviceTelemetry.Id == "kb1.001.depth")
                             {
                                 SetModelColor(this.fragment.Context, GetColorValue(deviceTelemetry.ColorValue), 0);
+                                AddDepthTelimetryNode(this.fragment);
                                 //this.transformableNode.Renderable.SetMaterial(0, solidColorInitialMaterialCache[GetColorValue(deviceTelemetry.ColorValue)]);
                             }
                             else if (deviceTelemetry.Id == "kb1.001.gasdetection")
                             {
                                 SetModelColor(this.fragment.Context, GetColorValue(deviceTelemetry.ColorValue), 9);
-
+                                AddGasdetectionTelimetryNode(this.fragment);
                             }
                             else if (deviceTelemetry.Id == "kb1.001.pressure")
                             {
                                 SetModelColor(this.fragment.Context, GetColorValue(deviceTelemetry.ColorValue), 8);
+                                AddPressureTelimetryNode(this.fragment);
                             }
                             else if (deviceTelemetry.Id == "kb1.001.flowin")
                             {
                                 SetModelColor(this.fragment.Context, GetColorValue(deviceTelemetry.ColorValue), 17);
+                                AddFlowTelimetryNode(this.fragment);
                             }
 
                         }
+
                         if (isAnomalyFound)
                         {
                             this.PlayAudio();
@@ -462,7 +374,8 @@ namespace SampleXamarin
                             this.StopAudio();
                             UnLoadHazardGIF();
                         }
-                       
+
+                        LoadTelemetryValue();
                     }
                     else
                     {
@@ -494,13 +407,114 @@ namespace SampleXamarin
             builder.Build(FinishLoading);
         }
 
-        private void LoadText()
+        private void AddDepthTelimetryNode(ArFragment arFragment)
         {
-            var builder = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.textElement);
-
-            builder.Build(FinishLoadingText);
+            transformableTextNodeDep = new TransformableNode(arFragment.TransformationSystem);
+            transformableTextNodeDep.TranslationController.Enabled = true;
+            transformableTextNodeDep.TranslationController.TransformableNode.LocalPosition = new Vector3(0.7f, 0.6f, 0.0f);
+            transformableTextNodeDep.ScaleController.Enabled = true;
+            transformableTextNodeDep.ScaleController.TransformableNode.LocalScale = new Vector3(1.0f, 1.0f, 0.0f);
+            transformableTextNodeDep.SetParent(AnchorNode);
         }
 
+        private void AddGasdetectionTelimetryNode(ArFragment arFragment)
+        {
+            transformableTextNodeGas = new TransformableNode(arFragment.TransformationSystem);
+            transformableTextNodeGas.TranslationController.Enabled = true;
+            transformableTextNodeGas.TranslationController.TransformableNode.LocalPosition = new Vector3(0.9f, 2.4f, 0.0f);
+            transformableTextNodeGas.ScaleController.Enabled = true;
+            transformableTextNodeGas.ScaleController.TransformableNode.LocalScale = new Vector3(1.0f, 1.0f, 0.0f);
+            transformableTextNodeGas.SetParent(AnchorNode);
+        }
+
+        private void AddPressureTelimetryNode(ArFragment arFragment)
+        {
+            transformableTextNodePre = new TransformableNode(arFragment.TransformationSystem);
+            transformableTextNodePre.TranslationController.Enabled = true;
+            transformableTextNodePre.TranslationController.TransformableNode.LocalPosition = new Vector3(0.8f, 2.6f, -0.2f);
+            transformableTextNodePre.ScaleController.Enabled = true;
+            transformableTextNodePre.ScaleController.TransformableNode.LocalScale = new Vector3(3.0f, 3.0f, 3.0f);
+            transformableTextNodePre.SetParent(AnchorNode);
+        }
+
+        private void AddFlowTelimetryNode(ArFragment arFragment)
+        {
+            transformableTextNodeFlo = new TransformableNode(arFragment.TransformationSystem);
+            transformableTextNodeFlo.TranslationController.Enabled = true;
+            transformableTextNodeFlo.TranslationController.TransformableNode.LocalPosition = new Vector3(-0.5f, 2.5f, 0.12f);
+            transformableTextNodeFlo.ScaleController.Enabled = true;
+            transformableTextNodeFlo.ScaleController.TransformableNode.LocalScale = new Vector3(1.0f, 1.0f, 0.0f);
+            transformableTextNodeFlo.SetParent(AnchorNode);
+        }
+
+
+
+        private void LoadTelemetryValue()
+        {
+            var builder_D = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.DepthTelemetry);
+            builder_D.Build(FinishLoadingText_D);
+
+            var builder_G = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.GasdetectionTelemetry);
+            builder_G.Build(FinishLoadingText_G);
+
+            var builder_P = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.PressureTelemetry);
+            builder_P.Build(FinishLoadingText_P);
+
+            var builder_F = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.PressureTelemetry);
+            builder_F.Build(FinishLoadingText_F);
+        }
+
+        private void FinishLoadingText_D(ViewRenderable model)
+        {
+            var telimetry = deviceTelemetries.Where(k => k.Id == "kb1.001.depth").FirstOrDefault();
+            if (telimetry != null)
+            {
+                transformableTextNodeDep.Renderable = model;
+                TextView textView = (TextView)model.View;
+                textView.SetText("Asset : kb1.001.depth" + "\n" + telimetry.Property +":"+ telimetry.Value.ToString() , TextView.BufferType.Normal);
+                textView.SetBackgroundResource(Resource.Drawable.yellowr);
+                this.transformableNode.AddChild(transformableTextNodeDep);
+            }
+        }
+
+        private void FinishLoadingText_G(ViewRenderable model)
+        {
+            var telimetry = deviceTelemetries.Where(k => k.Id == "kb1.001.gasdetection").FirstOrDefault();
+            if (telimetry != null)
+            {
+                transformableTextNodeGas.Renderable = model;
+                TextView textView = (TextView)model.View;
+                textView.SetText("Asset : kb1.001.gasdetection" + "\n" + telimetry.Property + ":" + telimetry.Value.ToString(), TextView.BufferType.Normal);
+                textView.SetBackgroundResource(Resource.Drawable.yellowr);
+                this.transformableNode.AddChild(transformableTextNodeGas);
+            }
+        }
+
+        private void FinishLoadingText_P(ViewRenderable model)
+        {
+            var telimetry = deviceTelemetries.Where(k => k.Id == "kb1.001.pressure").FirstOrDefault();
+            if (telimetry != null)
+            {
+                transformableTextNodePre.Renderable = model;
+                TextView textView = (TextView)model.View;
+                textView.SetText("Asset : kb1.001.pressure" + "\n" + "pressure" + ":" + telimetry.Value.ToString(), TextView.BufferType.Normal);
+                textView.SetBackgroundResource(Resource.Drawable.yellowr);
+                this.transformableNode.AddChild(transformableTextNodePre);
+            }
+        }
+
+        private void FinishLoadingText_F(ViewRenderable model)
+        {
+            var telimetry = deviceTelemetries.Where(k => k.Id == "kb1.001.flowin").FirstOrDefault();
+            if (telimetry != null)
+            {
+                transformableTextNodeFlo.Renderable = model;
+                TextView textView = (TextView)model.View;
+                textView.SetText("Asset : kb1.001.flowin" + "\n" + telimetry.Property + ":" + telimetry.Value.ToString(), TextView.BufferType.Normal);
+                textView.SetBackgroundResource(Resource.Drawable.bubble_yellow);
+                this.transformableNode.AddChild(transformableTextNodeFlo);
+            }
+        }
         private void LoadHazardGIF()
         {
             var builder = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.hazardElement);
@@ -528,6 +542,7 @@ namespace SampleXamarin
                 return Android.Graphics.Color.Red;
             }
         }
+
         public void PlayAudio()
         {
             Intent serviceIntent = new Intent(this.fragment.Context, typeof(AudioService));
@@ -546,6 +561,7 @@ namespace SampleXamarin
     {
         public string Id { get; set; }
         public int ColorValue { get; set; }
-
+        public string Property { get; set; }
+        public decimal Value { get; set; }
     }
 }

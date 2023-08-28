@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/flowtelemetry"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:textColor="@android:color/holo_red_dark"
+    android:padding="6dp"
+    android:text="Hi. How are you? Some random text here and here. I need spend more time for android dev jhgjhsdvzjhvjhhvjhxzVHv,jxzhvjh,vx,bdv,zxmjxb"
+    android:singleLine="false" 
+    android:autoSizeTextType="uniform"
+    android:textAlignment="center" 
+    android:background="@drawable/bubble_yellow"/>
