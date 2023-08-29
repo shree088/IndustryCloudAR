@@ -1,12 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-using Android.App;
 using Android.Content;
-using Android.Content.Res;
 using Android.Media;
-using Android.Net;
-using Android.Support.V4.App;
 using Android.Widget;
 using Google.AR.Core;
 using Google.AR.Sceneform;
@@ -15,26 +11,21 @@ using Google.AR.Sceneform.Math;
 using Google.AR.Sceneform.Rendering;
 using Google.AR.Sceneform.UX;
 using Java.IO;
-using Java.Lang;
 using Java.Util.Concurrent;
 using Java.Util.Functions;
 using Microsoft.Azure.SpatialAnchors;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Xamarin.Essentials;
-using Android.Content.Res;
-using static Android.Graphics.ColorSpace;
 using System.Linq;
+using System.Net.Http;
+using Xamarin.Essentials;
 
 namespace NeudesicIC
 {
     public class ModelRenderableLoadedCallback : Java.Lang.Object, IConsumer
     {
-        private AzureSpatialAnchorsCoarseRelocActivity activity;
+        //private AzureSpatialAnchorsCoarseRelocActivity activity;
         private ModelRenderable modelRenderable;
         
         public ModelRenderableLoadedCallback(ModelRenderable modelRenderable)
@@ -105,7 +96,6 @@ namespace NeudesicIC
         private NamedShape shape = NamedShape.Sphere;
         private Material material;
         private ArFragment fragment;
-        private FragmentActivity activity;
         public List<int> partNumbers = new List<int>() { 0, 8, 9, 17 };
         private static Dictionary<int, CompletableFuture> solidColorMaterialCache = new Dictionary<int, CompletableFuture>();
         public static Dictionary<int, Material> solidColorModelMaterialCache = new Dictionary<int, Material>();
@@ -140,6 +130,10 @@ namespace NeudesicIC
 
             this.mediaPlayer = MediaPlayer.Create(this.fragment.Context, Resource.Raw.hazard_alarm);
 
+            AddDepthTelimetryNode(this.fragment);
+            AddGasdetectionTelimetryNode(this.fragment);
+            AddPressureTelimetryNode(this.fragment);
+            AddFlowTelimetryNode(this.fragment);
         }
 
         public AnchorVisual(ArFragment arFragment, CloudSpatialAnchor cloudAnchor)
@@ -218,12 +212,7 @@ namespace NeudesicIC
         public void SetModelColor(Context context, int rgb, int key)
         {
             lock (this)
-            {
-                //if (!solidColorModelMaterialCache.ContainsKey(key))
-                //{
-                //    solidColorModelMaterialCache[key] = MaterialFactory.MakeOpaqueWithColor(context, new Color(rgb));
-                //}
-                //CompletableFuture loadMaterial = solidColorModelMaterialCache[key];
+            {                
                 MaterialFactory.MakeOpaqueWithColor(context, new Color(rgb)).ThenAccept(new ModelMaterialLoadedCallback(this.transformableNode, key));
             }
         }
@@ -343,25 +332,20 @@ namespace NeudesicIC
                             if (deviceTelemetry.Id == "kb1.001.depth")
                             {
                                 SetModelColor(this.fragment.Context, GetColorValue(deviceTelemetry.ColorValue), 0);
-                                AddDepthTelimetryNode(this.fragment);
                                 //this.transformableNode.Renderable.SetMaterial(0, solidColorInitialMaterialCache[GetColorValue(deviceTelemetry.ColorValue)]);
                             }
                             else if (deviceTelemetry.Id == "kb1.001.gasdetection")
                             {
                                 SetModelColor(this.fragment.Context, GetColorValue(deviceTelemetry.ColorValue), 9);
-                                AddGasdetectionTelimetryNode(this.fragment);
                             }
                             else if (deviceTelemetry.Id == "kb1.001.pressure")
                             {
                                 SetModelColor(this.fragment.Context, GetColorValue(deviceTelemetry.ColorValue), 8);
-                                AddPressureTelimetryNode(this.fragment);
                             }
                             else if (deviceTelemetry.Id == "kb1.001.flowin")
                             {
                                 SetModelColor(this.fragment.Context, GetColorValue(deviceTelemetry.ColorValue), 17);
-                                AddFlowTelimetryNode(this.fragment);
                             }
-
                         }
 
                         if (isAnomalyFound)
@@ -515,6 +499,7 @@ namespace NeudesicIC
                 this.transformableNode.AddChild(transformableTextNodeFlo);
             }
         }
+        
         private void LoadHazardGIF()
         {
             var builder = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.hazardElement);
