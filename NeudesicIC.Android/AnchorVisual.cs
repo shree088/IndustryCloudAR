@@ -86,6 +86,7 @@ namespace NeudesicIC
             Cylinder,
         }
 
+        private TransformableNode transformableTextNodeNeu;
         private TransformableNode transformableNode;
         private TransformableNode transformableTextNodeDep;
         private TransformableNode transformableTextNodeGas;
@@ -117,7 +118,7 @@ namespace NeudesicIC
             transformableNode.TranslationController.Dispose();
             transformableNode.RotationController.Enabled = false;
             transformableNode.SetParent(AnchorNode);
-          
+
             transformableGifNode = new TransformableNode(arFragment.TransformationSystem);
             transformableGifNode.TranslationController.Enabled = true;
             transformableGifNode.TranslationController.TransformableNode.LocalPosition = new Vector3(0.0f, 0.8f, 0.3f);
@@ -134,6 +135,7 @@ namespace NeudesicIC
             AddGasdetectionTelimetryNode(this.fragment);
             AddPressureTelimetryNode(this.fragment);
             AddFlowTelimetryNode(this.fragment);
+            NeudesicICDemoNode(this.fragment);
         }
 
         public AnchorVisual(ArFragment arFragment, CloudSpatialAnchor cloudAnchor)
@@ -391,6 +393,16 @@ namespace NeudesicIC
             builder.Build(FinishLoading);
         }
 
+        private void NeudesicICDemoNode(ArFragment arFragment)
+        {
+            transformableTextNodeNeu = new TransformableNode(arFragment.TransformationSystem);
+            transformableTextNodeNeu.TranslationController.Enabled = true;
+            transformableTextNodeNeu.TranslationController.TransformableNode.LocalPosition = new Vector3(0.0f, 0.5f, 0.3f);
+            transformableTextNodeNeu.ScaleController.Enabled = true;
+            transformableTextNodeNeu.ScaleController.TransformableNode.LocalScale = new Vector3(3.0f, 3.0f, 3.0f);
+            transformableTextNodeNeu.SetParent(AnchorNode);
+        }
+
         private void AddDepthTelimetryNode(ArFragment arFragment)
         {
             transformableTextNodeDep = new TransformableNode(arFragment.TransformationSystem);
@@ -431,10 +443,8 @@ namespace NeudesicIC
             transformableTextNodeFlo.SetParent(AnchorNode);
         }
 
-
-
         private void LoadTelemetryValue()
-        {
+        {           
             var builder_D = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.DepthTelemetry);
             builder_D.Build(FinishLoadingText_D);
 
@@ -446,6 +456,21 @@ namespace NeudesicIC
 
             var builder_F = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.PressureTelemetry);
             builder_F.Build(FinishLoadingText_F);
+
+            var builder_N = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.textElement);
+            builder_N.Build(FinishLoadingText_NeudesicText);
+        }
+
+        private void FinishLoadingText_NeudesicText(ViewRenderable model)
+        {
+            var telimetry = deviceTelemetries.Where(k => k.Id == "kb1.001.depth").FirstOrDefault();
+            if (telimetry != null)
+            {
+                transformableTextNodeNeu.Renderable = model;
+                TextView textView = (TextView)model.View;
+                textView.SetText("Neudesic IC Demo", TextView.BufferType.Normal);
+                this.transformableNode.AddChild(transformableTextNodeNeu);
+            }
         }
 
         private void FinishLoadingText_D(ViewRenderable model)
