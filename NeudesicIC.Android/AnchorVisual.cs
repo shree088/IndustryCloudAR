@@ -401,6 +401,9 @@ namespace NeudesicIC
             transformableTextNodeNeu.ScaleController.Enabled = true;
             transformableTextNodeNeu.ScaleController.TransformableNode.LocalScale = new Vector3(3.0f, 3.0f, 3.0f);
             transformableTextNodeNeu.SetParent(AnchorNode);
+
+            var builder_N = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.textElement);
+            builder_N.Build(FinishLoadingText_NeudesicText);
         }
 
         private void AddDepthTelimetryNode(ArFragment arFragment)
@@ -448,29 +451,22 @@ namespace NeudesicIC
             var builder_D = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.DepthTelemetry);
             builder_D.Build(FinishLoadingText_D);
 
-            var builder_G = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.GasdetectionTelemetry);
+            var builder_G = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.DepthTelemetry);
             builder_G.Build(FinishLoadingText_G);
 
-            var builder_P = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.PressureTelemetry);
+            var builder_P = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.DepthTelemetry);
             builder_P.Build(FinishLoadingText_P);
 
-            var builder_F = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.PressureTelemetry);
+            var builder_F = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.DepthTelemetry);
             builder_F.Build(FinishLoadingText_F);
-
-            var builder_N = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.textElement);
-            builder_N.Build(FinishLoadingText_NeudesicText);
         }
 
         private void FinishLoadingText_NeudesicText(ViewRenderable model)
         {
-            var telimetry = deviceTelemetries.Where(k => k.Id == "kb1.001.depth").FirstOrDefault();
-            if (telimetry != null)
-            {
-                transformableTextNodeNeu.Renderable = model;
-                TextView textView = (TextView)model.View;
-                textView.SetText("Neudesic IC Demo", TextView.BufferType.Normal);
-                this.transformableNode.AddChild(transformableTextNodeNeu);
-            }
+            transformableTextNodeNeu.Renderable = model;
+            TextView textView = (TextView)model.View;
+            textView.SetText("Neudesic IC Demo", TextView.BufferType.Normal);
+            this.transformableNode.AddChild(transformableTextNodeNeu);
         }
 
         private void FinishLoadingText_D(ViewRenderable model)

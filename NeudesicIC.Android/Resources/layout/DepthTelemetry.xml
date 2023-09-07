@@ -8,6 +8,5 @@
     android:text="Hi. How are you? Some random text here and here. I need spend more time for android dev jhgjhsdvzjhvjhhvjhxzVHv,jxzhvjh,vx,bdv,zxmjxb"
     android:singleLine="false" 
     android:autoSizeTextType="uniform"
-    android:textAlignment="center"
-    android:background="@drawable/yellowr"
+    android:textAlignment="center"    
     />
