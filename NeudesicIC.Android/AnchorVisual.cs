@@ -402,8 +402,8 @@ namespace NeudesicIC
             transformableTextNodeNeu.ScaleController.TransformableNode.LocalScale = new Vector3(3.0f, 3.0f, 3.0f);
             transformableTextNodeNeu.SetParent(AnchorNode);
 
-            var builder_N = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.textElement);
-            builder_N.Build(FinishLoadingText_NeudesicText);
+            //var builder_N = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.textElement);
+            //builder_N.Build(FinishLoadingText_NeudesicText);
         }
 
         private void AddDepthTelimetryNode(ArFragment arFragment)
@@ -451,13 +451,13 @@ namespace NeudesicIC
             var builder_D = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.DepthTelemetry);
             builder_D.Build(FinishLoadingText_D);
 
-            var builder_G = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.DepthTelemetry);
+            var builder_G = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.GasdetectionTelemetry);
             builder_G.Build(FinishLoadingText_G);
 
-            var builder_P = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.DepthTelemetry);
+            var builder_P = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.PressureTelemetry);
             builder_P.Build(FinishLoadingText_P);
 
-            var builder_F = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.DepthTelemetry);
+            var builder_F = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.FlowTelemetry);
             builder_F.Build(FinishLoadingText_F);
         }
 
