@@ -18,7 +18,8 @@
   <string name="locate_button_text">Locate</string>
   <string name="create_anchor">Create Anchor</string>
   <string name="start_watcher">Start Watcher</string>
-  <string name="add_anchor">Place OilRig Model</string>
+  <string name="place_cement_modl">Place Cement Model</string>
+  <string name="place_oilrig_modl">Place oilrig Model</string>
   <string name="geolocation_status">GeoLocation: </string>
   <string name="wifi_status">Wi-Fi: </string>
   <string name="bluetooth_status">Bluetooth: </string>

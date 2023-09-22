@@ -85,17 +85,13 @@
     <Compile Include="WatcherFragment.cs" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidAsset Include="Assets\traffic_cones.glb">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </AndroidAsset>
     <AndroidAsset Include="Assets\oil.glb" />
+    <AndroidAsset Include="Assets\cement1.glb" />
+    <AndroidAsset Include="Assets\cament_factory.glb" />
     <None Include="Properties\AndroidManifest.xml" />
     <None Include="Assets\AboutAssets.txt" />
     <None Include="Resources\AboutResources.txt" />
-    <AndroidResource Include="Resources\Raw\chair.sfb" />
-    <AndroidResource Include="Resources\Raw\fox_face.sfb" />
     <AndroidResource Include="Resources\Raw\andy.sfb" />
-    <AndroidResource Include="Resources\Raw\traffic_cones.glb" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\activity_main.axml">

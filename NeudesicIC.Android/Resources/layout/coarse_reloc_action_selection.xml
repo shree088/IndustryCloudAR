@@ -11,15 +11,15 @@
         android:id="@+id/add_anchor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="OnAddAnchorClicked"
-        android:text="@string/add_anchor" />
+        android:onClick="OnAddOilrigClicked"
+        android:text="@string/place_oilrig_modl" />
 
 
-  <!--  <Button
+   <Button
         android:id="@+id/start_watcher"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="OnStartWatcherClicked"
-        android:text="@string/start_watcher" />-->
+        android:onClick="OnAddCementModelClicked"
+        android:text="@string/place_cement_modl" />
 
 </LinearLayout>

@@ -104,18 +104,25 @@ namespace NeudesicIC
         public event EventHandler<bool> ModelLoaded;
         public MediaPlayer mediaPlayer;
         List<DeviceTelemetry> deviceTelemetries;
+        public string SelectedModel;
 
-        public AnchorVisual(ArFragment arFragment, Anchor localAnchor)
+        public AnchorVisual(ArFragment arFragment, Anchor localAnchor , string selectedModel = null)
         {
             this.fragment = arFragment;
             AnchorNode = new AnchorNode(localAnchor);
 
             transformableNode = new TransformableNode(arFragment.TransformationSystem);
             transformableNode.ScaleController.Enabled = true;
+            SelectedModel = selectedModel;
             transformableNode.ScaleController.MinScale = 0.3f;
             transformableNode.ScaleController.MaxScale = 0.7f;
             transformableNode.ScaleController.TransformableNode.LocalScale = new Vector3(0.5f, 0.5f, 0.5f);
-            transformableNode.TranslationController.Dispose();
+            
+            if (selectedModel == "cement")
+            {              
+                transformableNode.LocalPosition = new Vector3(0.0f, -0.2f, 0.0f);
+            }
+            //transformableNode.TranslationController.Dispose();
             transformableNode.RotationController.Enabled = false;
             transformableNode.SetParent(AnchorNode);
 
@@ -139,7 +146,7 @@ namespace NeudesicIC
         }
 
         public AnchorVisual(ArFragment arFragment, CloudSpatialAnchor cloudAnchor)
-            : this(arFragment, cloudAnchor.LocalAnchor)
+            : this(arFragment, cloudAnchor.LocalAnchor , string.Empty)
         {
             this.fragment = arFragment;
             CloudAnchor = cloudAnchor;
@@ -346,7 +353,7 @@ namespace NeudesicIC
                             }
                             else if (deviceTelemetry.Id == "kb1.001.flowin")
                             {
-                                SetModelColor(this.fragment.Context, GetColorValue(deviceTelemetry.ColorValue), 17);
+                                SetModelColor(this.fragment.Context, GetColorValue(deviceTelemetry.ColorValue), 10);
                             }
                         }
 
@@ -381,6 +388,12 @@ namespace NeudesicIC
             var builder = ModelRenderable.InvokeBuilder();
             var javaClass = Java.Lang.Class.FromType(builder.GetType());
             var uri = Android.Net.Uri.FromFile(new File("//android_asset/oil.glb"));
+
+            if (SelectedModel == "cement")
+            {
+                uri = Android.Net.Uri.FromFile(new File("//android_asset/cament_factory.glb"));
+            }
+            
             var methods = javaClass.GetMethods();
             var model = RenderableSource
                 .InvokeBuilder()

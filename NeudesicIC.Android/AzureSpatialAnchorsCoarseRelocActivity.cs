@@ -127,10 +127,20 @@ namespace NeudesicIC
             base.OnPause();
         }
 
-        [Export("OnAddAnchorClicked")]
-        public void OnAddAnchorClicked(View view)
+        [Export("OnAddOilrigClicked")]
+        public void OnAddOilrigClicked(View view)
         {
             var placementFragment = new AnchorPlacementFragment();
+            placementFragment.SelectedModel = "oilrig";
+            placementFragment.OnAnchorPlaced = OnAnchorPlaced;
+            FragmentHelper.PushFragment(this, placementFragment);
+        }
+
+        [Export("OnAddCementModelClicked")]
+        public void OnAddCementModelClicked(View view)
+        {
+            var placementFragment = new AnchorPlacementFragment();
+            placementFragment.SelectedModel = "cement";
             placementFragment.OnAnchorPlaced = OnAnchorPlaced;
             FragmentHelper.PushFragment(this, placementFragment);
         }

@@ -54,6 +54,8 @@ namespace NeudesicIC
 
         public AnchorPlacementListener OnAnchorPlaced { private get; set; }
 
+        public string SelectedModel { get; set; }
+
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             return inflater.Inflate(Resource.Layout.coarse_reloc_anchor_placement, container, false);
@@ -73,6 +75,12 @@ namespace NeudesicIC
 
             hintText = view.FindViewById<TextView>(Resource.Id.hint_text);
             syncTelemetryButton = view.FindViewById<Button>(Resource.Id.confirm_placement);
+            syncTelemetryButton.Visibility = ViewStates.Invisible;
+
+            if (SelectedModel == "oilrig")
+            {
+                syncTelemetryButton.Visibility = ViewStates.Visible;
+            }
             shapeSelection = view.FindViewById<RadioGroup>(Resource.Id.shape_selection);
             selectLayout = view.FindViewById<LinearLayout>(Resource.Id.co_select_layout);
         }
@@ -80,11 +88,13 @@ namespace NeudesicIC
         public override void OnStart()
         {
             base.OnStart();
-
-            syncTelemetryButton.Enabled = false;
+            if (SelectedModel == "oilrig")
+            {
+                syncTelemetryButton.Enabled = false;
+                syncTelemetryButton.SetOnClickListener(this);
+            }
             selectLayout.Visibility = ViewStates.Invisible;
-            arFragment.SetOnTapArPlaneListener(this);
-            syncTelemetryButton.SetOnClickListener(this);
+            arFragment.SetOnTapArPlaneListener(this);           
             shapeSelection.SetOnCheckedChangeListener(this);
         }
 
@@ -116,7 +126,7 @@ namespace NeudesicIC
             }
 
             Anchor localAnchor = hitResult.CreateAnchor();
-            visual = new AnchorVisual(arFragment, localAnchor);
+            visual = new AnchorVisual(arFragment, localAnchor, SelectedModel);
             visual.IsMovable = true;
             visual.Shape = SelectedShape;
             visual.SetColor(arFragment.Context, Color.Yellow);
@@ -128,7 +138,10 @@ namespace NeudesicIC
 
         private void Visual_ModelLoaded(object sender, bool e)
         {
-            syncTelemetryButton.Enabled = true;
+            if (SelectedModel == "oilrig")
+            {
+                syncTelemetryButton.Enabled = true;
+            }
         }
 
         void IOnCheckedChangeListener.OnCheckedChanged(RadioGroup radioGroup, int selectedId)
@@ -143,7 +156,7 @@ namespace NeudesicIC
 
         public void OnClick(View view)
         {
-            if (visual != null)
+            if (visual != null && SelectedModel == "oilrig" )
             {
                 syncTelemetryButton.Enabled = false;
                 visual.Fetch_LoadTelemetry();
@@ -159,7 +172,7 @@ namespace NeudesicIC
         private void TimerCallback(object state)
         {
             Console.WriteLine($"Timer callback executed at: {DateTime.Now}");
-            if (visual != null)
+            if (visual != null && SelectedModel == "oilrig")
             {
                 visual.Fetch_LoadTelemetry();
             }
