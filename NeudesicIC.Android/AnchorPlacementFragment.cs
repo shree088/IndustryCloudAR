@@ -54,7 +54,7 @@ namespace NeudesicIC
 
         public AnchorPlacementListener OnAnchorPlaced { private get; set; }
 
-        public string SelectedModel { get; set; }
+        public string SelectedModel { get; set; } 
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {

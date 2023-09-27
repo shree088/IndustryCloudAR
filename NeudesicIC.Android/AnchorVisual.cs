@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using Xamarin.Essentials;
+using static Android.Graphics.ColorSpace;
 
 namespace NeudesicIC
 {
@@ -105,7 +106,7 @@ namespace NeudesicIC
         public MediaPlayer mediaPlayer;
         List<DeviceTelemetry> deviceTelemetries;
         public string SelectedModel;
-
+        public bool IsModelLoaded = false;
         public AnchorVisual(ArFragment arFragment, Anchor localAnchor , string selectedModel = null)
         {
             this.fragment = arFragment;
@@ -113,16 +114,21 @@ namespace NeudesicIC
 
             transformableNode = new TransformableNode(arFragment.TransformationSystem);
             transformableNode.ScaleController.Enabled = true;
-            SelectedModel = selectedModel;
-            transformableNode.ScaleController.MinScale = 0.3f;
-            transformableNode.ScaleController.MaxScale = 0.7f;
-            transformableNode.ScaleController.TransformableNode.LocalScale = new Vector3(0.5f, 0.5f, 0.5f);
-            
+            SelectedModel = selectedModel;           
             if (selectedModel == "cement")
-            {              
-                transformableNode.LocalPosition = new Vector3(0.0f, -0.2f, 0.0f);
+            {
+                transformableNode.ScaleController.MinScale = 0.2f;
+                transformableNode.ScaleController.MaxScale = 2.0f;
+                transformableNode.ScaleController.TransformableNode.LocalScale = new Vector3(0.3f, 0.3f, 0.3f);
+                transformableNode.LocalPosition = new Vector3(0.0f, 0.5f, 0.0f);
             }
-            //transformableNode.TranslationController.Dispose();
+            else
+            {
+                transformableNode.ScaleController.MinScale = 0.3f;
+                transformableNode.ScaleController.MaxScale = 0.7f;
+                transformableNode.ScaleController.TransformableNode.LocalScale = new Vector3(0.5f, 0.5f, 0.5f);
+            }
+            transformableNode.TranslationController.Dispose();
             transformableNode.RotationController.Enabled = false;
             transformableNode.SetParent(AnchorNode);
 
@@ -248,10 +254,10 @@ namespace NeudesicIC
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 AnchorNode.Renderable = null;
-                AnchorNode.SetParent(null);
-                Anchor localAnchor = AnchorNode.Anchor;
-                if (localAnchor != null)
-                {
+            AnchorNode.SetParent(null);
+            Anchor localAnchor = AnchorNode.Anchor;
+            if (localAnchor != null)
+            {
                     AnchorNode.Anchor = null;
                     localAnchor.Detach();
                 }
@@ -262,21 +268,21 @@ namespace NeudesicIC
         {
             if (material != null)
             {
-
                 LoadGlb();
                 //LoadText(); 
             }
         }
 
         private void FinishLoading(ModelRenderable model)
-        {         
+        {       
             transformableNode.Renderable = model;
             //MaterialFactory.MakeOpaqueWithColor(this.fragment.Context, new Color(Android.Graphics.Color.Red))
             //         .ThenAccept(new ModelRenderableLoadedCallback((ModelRenderable)transformableNode.Renderable));
             //SetColor(this.fragment.Context, Android.Graphics.Color.Red);
             //ApplyColorToChildNodes(transformableNode, Android.Graphics.Color.Red);
             //LoadTelemetry();
-           // this.StartPlayer("//android_asset/hazard-alarm.mp3");
+            // this.StartPlayer("//android_asset/hazard-alarm.mp3");
+           
             this.ModelLoaded?.Invoke(this, true);
         }
 
@@ -288,8 +294,7 @@ namespace NeudesicIC
             {
                 SetModelColor(this.fragment.Context, Android.Graphics.Color.Green, partNumber);             
             }
-
-                
+                            
             //for(int i = 0; i < transformableNode.Renderable.SubmeshCount; i++)
             //{
             //    transformableNode.Renderable.SetMaterial(i, solidColorModelMaterialCache[i]);
@@ -341,19 +346,23 @@ namespace NeudesicIC
                             if (deviceTelemetry.Id == "kb1.001.depth")
                             {
                                 SetModelColor(this.fragment.Context, GetColorValue(deviceTelemetry.ColorValue), 0);
+                                UpdateTelemetryValue(deviceTelemetry, 0);
                                 //this.transformableNode.Renderable.SetMaterial(0, solidColorInitialMaterialCache[GetColorValue(deviceTelemetry.ColorValue)]);
                             }
                             else if (deviceTelemetry.Id == "kb1.001.gasdetection")
                             {
                                 SetModelColor(this.fragment.Context, GetColorValue(deviceTelemetry.ColorValue), 9);
+                                UpdateTelemetryValue(deviceTelemetry, 9);
                             }
                             else if (deviceTelemetry.Id == "kb1.001.pressure")
                             {
                                 SetModelColor(this.fragment.Context, GetColorValue(deviceTelemetry.ColorValue), 8);
+                                UpdateTelemetryValue(deviceTelemetry, 8);
                             }
                             else if (deviceTelemetry.Id == "kb1.001.flowin")
                             {
                                 SetModelColor(this.fragment.Context, GetColorValue(deviceTelemetry.ColorValue), 10);
+                                UpdateTelemetryValue(deviceTelemetry, 10);
                             }
                         }
 
@@ -368,7 +377,10 @@ namespace NeudesicIC
                             UnLoadHazardGIF();
                         }
 
-                        LoadTelemetryValue();
+                        if (IsModelLoaded == false)
+                        {
+                            LoadTelemetryValue();
+                        }
                     }
                     else
                     {
@@ -384,21 +396,22 @@ namespace NeudesicIC
 
         private void LoadGlb()
         {
-            
+            var uri = SelectedModel == "cement" ? Android.Net.Uri.FromFile(new File("//android_asset/cementfactory.glb"))
+                : Android.Net.Uri.FromFile(new File("//android_asset/oil.glb"));
+
+            Render3DModel(uri);
+
+        }
+
+        private void Render3DModel(Android.Net.Uri uri)
+        {
             var builder = ModelRenderable.InvokeBuilder();
             var javaClass = Java.Lang.Class.FromType(builder.GetType());
-            var uri = Android.Net.Uri.FromFile(new File("//android_asset/oil.glb"));
-
-            if (SelectedModel == "cement")
-            {
-                uri = Android.Net.Uri.FromFile(new File("//android_asset/cament_factory.glb"));
-            }
-            
             var methods = javaClass.GetMethods();
             var model = RenderableSource
                 .InvokeBuilder()
                 .SetSource(this.fragment.Context, uri, RenderableSource.SourceType.Glb)
-                //.SetScale(0.05f)
+                //.SetRecenterMode(RenderableSource.RecenterMode.Center)
                 // Or .gltf              
                 .Build();
             var method = methods[13];
@@ -461,6 +474,7 @@ namespace NeudesicIC
 
         private void LoadTelemetryValue()
         {           
+            IsModelLoaded = true;
             var builder_D = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.DepthTelemetry);
             builder_D.Build(FinishLoadingText_D);
 
@@ -474,6 +488,38 @@ namespace NeudesicIC
             builder_F.Build(FinishLoadingText_F);
         }
 
+        private void UpdateTelemetryValue(DeviceTelemetry telimetry, int key)
+        {
+            if (IsModelLoaded)
+            {
+                if (key == 0)
+                {
+                    var renderableView = (ViewRenderable)transformableTextNodeDep.Renderable;
+                    var textView = (TextView)renderableView.View;
+                    textView.SetText("Asset : kb1.001.depth" + "\n" + telimetry.Property + ":" + telimetry.Value.ToString(), TextView.BufferType.Normal);
+                }
+
+                if (key == 9)
+                {
+                    var renderableView = (ViewRenderable)transformableTextNodeGas.Renderable;
+                    var textView = (TextView)renderableView.View;
+                    textView.SetText("Asset : kb1.001.gasdetection" + "\n" + telimetry.Property + ":" + telimetry.Value.ToString(), TextView.BufferType.Normal);
+                }
+
+                if (key == 8)
+                {
+                    var renderableView = (ViewRenderable)transformableTextNodePre.Renderable;
+                    var textView = (TextView)renderableView.View;
+                    textView.SetText("Asset : kb1.001.pressure" + "\n" + telimetry.Property + ":" + telimetry.Value.ToString(), TextView.BufferType.Normal);
+                }
+                if (key == 10)
+                {
+                    var renderableView = (ViewRenderable)transformableTextNodeFlo.Renderable;
+                    var textView = (TextView)renderableView.View;
+                    textView.SetText("Asset : kb1.001.flowin" + "\n" + telimetry.Property + ":" + telimetry.Value.ToString(), TextView.BufferType.Normal);
+                }
+            }
+        }
         private void FinishLoadingText_NeudesicText(ViewRenderable model)
         {
             transformableTextNodeNeu.Renderable = model;
@@ -487,7 +533,7 @@ namespace NeudesicIC
             var telimetry = deviceTelemetries.Where(k => k.Id == "kb1.001.depth").FirstOrDefault();
             if (telimetry != null)
             {
-                transformableTextNodeDep.Renderable = model;
+                transformableTextNodeDep.Renderable = model;              
                 TextView textView = (TextView)model.View;
                 textView.SetText("Asset : kb1.001.depth" + "\n" + telimetry.Property +":"+ telimetry.Value.ToString() , TextView.BufferType.Normal);
                 textView.SetBackgroundResource(Resource.Drawable.yellowr);
@@ -574,6 +620,7 @@ namespace NeudesicIC
             Intent stopIntent = new Intent("StopAudioAction");
             this.fragment.Context.SendBroadcast(stopIntent);
         }
+
     }
 
     public class DeviceTelemetry

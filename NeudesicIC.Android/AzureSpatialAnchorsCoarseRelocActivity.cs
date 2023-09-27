@@ -201,7 +201,7 @@ namespace NeudesicIC
         public void OnBackClicked(View view)
         {
             if (!FragmentHelper.BackToPreviousFragment(this))
-            {
+            {               
                 Finish();
             }
         }
