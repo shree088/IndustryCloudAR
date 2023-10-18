@@ -3,6 +3,7 @@
 
 using Android.Content;
 using Android.Media;
+using Android.Text;
 using Android.Widget;
 using Google.AR.Core;
 using Google.AR.Sceneform;
@@ -19,8 +20,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Xml;
 using Xamarin.Essentials;
+using static Android.Content.ClipData;
 using static Android.Graphics.ColorSpace;
+using static Android.Text.BoringLayout;
 
 namespace NeudesicIC
 {
@@ -28,10 +32,10 @@ namespace NeudesicIC
     {
         //private AzureSpatialAnchorsCoarseRelocActivity activity;
         private ModelRenderable modelRenderable;
-        
+
         public ModelRenderableLoadedCallback(ModelRenderable modelRenderable)
         {
-           
+
             this.modelRenderable = modelRenderable;
         }
 
@@ -61,10 +65,10 @@ namespace NeudesicIC
 
     public class ModelMaterialLoadedCallback : Java.Lang.Object, IConsumer
     {
-        
+
         private TransformableNode node;
         private int key;
-        public ModelMaterialLoadedCallback(TransformableNode node,int key)
+        public ModelMaterialLoadedCallback(TransformableNode node, int key)
         {
 
             this.key = key;
@@ -95,6 +99,11 @@ namespace NeudesicIC
         private TransformableNode transformableTextNodeFlo;
         private TransformableNode transformableGifNode;
 
+        private TransformableNode transformableTextNodeCementKiln;
+        private TransformableNode transformableTextNodeCementSilo1;
+        private TransformableNode transformableTextNodeCementSilo2;
+        private TransformableNode transformableTextNodeCementVrm;
+
         private NamedShape shape = NamedShape.Sphere;
         private Material material;
         private ArFragment fragment;
@@ -104,17 +113,18 @@ namespace NeudesicIC
         public static Dictionary<int, Material> solidColorInitialMaterialCache = new Dictionary<int, Material>();
         public event EventHandler<bool> ModelLoaded;
         public MediaPlayer mediaPlayer;
-        List<DeviceTelemetry> deviceTelemetries;
+        List<OilRigDeviceTelemetry> deviceTelemetries;
+        List<CementFactoryTelemetry> cementFactoriyTelementry;
         public string SelectedModel;
         public bool IsModelLoaded = false;
-        public AnchorVisual(ArFragment arFragment, Anchor localAnchor , string selectedModel = null)
+        public AnchorVisual(ArFragment arFragment, Anchor localAnchor, string selectedModel = null)
         {
             this.fragment = arFragment;
             AnchorNode = new AnchorNode(localAnchor);
 
             transformableNode = new TransformableNode(arFragment.TransformationSystem);
             transformableNode.ScaleController.Enabled = true;
-            SelectedModel = selectedModel;           
+            SelectedModel = selectedModel;
             if (selectedModel == "cement")
             {
                 transformableNode.ScaleController.MinScale = 0.2f;
@@ -149,10 +159,44 @@ namespace NeudesicIC
             AddPressureTelimetryNode(this.fragment);
             AddFlowTelimetryNode(this.fragment);
             NeudesicICDemoNode(this.fragment);
+            AddCementPopupNodes(this.fragment);
+        }
+
+        public void AddCementPopupNodes(ArFragment fragment)
+        {
+            transformableTextNodeCementKiln = new TransformableNode(fragment.TransformationSystem);
+            transformableTextNodeCementKiln.TranslationController.Enabled = true;
+            transformableTextNodeCementKiln.TranslationController.TransformableNode.LocalPosition = new Vector3(0.7f, 0.6f, 0.0f);
+            transformableTextNodeCementKiln.ScaleController.Enabled = true;
+            transformableTextNodeCementKiln.ScaleController.TransformableNode.LocalScale = new Vector3(1.0f, 1.0f, 0.0f);
+            transformableTextNodeCementKiln.SetParent(AnchorNode);
+
+            transformableTextNodeCementSilo1 = new TransformableNode(fragment.TransformationSystem);
+            transformableTextNodeCementSilo1.TranslationController.Enabled = true;
+            transformableTextNodeCementSilo1.TranslationController.TransformableNode.LocalPosition = new Vector3(0.1f, 0.2f, 0.0f);
+            transformableTextNodeCementSilo1.ScaleController.Enabled = true;
+            transformableTextNodeCementSilo1.ScaleController.TransformableNode.LocalScale = new Vector3(1.0f, 1.0f, 0.0f);
+            transformableTextNodeCementSilo1.SetParent(AnchorNode);
+
+
+            transformableTextNodeCementSilo2 = new TransformableNode(fragment.TransformationSystem);
+            transformableTextNodeCementSilo2.TranslationController.Enabled = true;
+            transformableTextNodeCementSilo2.TranslationController.TransformableNode.LocalPosition = new Vector3(0.2f, 0.5f, 0.0f);
+            transformableTextNodeCementSilo2.ScaleController.Enabled = true;
+            transformableTextNodeCementSilo2.ScaleController.TransformableNode.LocalScale = new Vector3(1.0f, 1.0f, 0.0f);
+            transformableTextNodeCementSilo2.SetParent(AnchorNode);
+
+
+            transformableTextNodeCementVrm = new TransformableNode(fragment.TransformationSystem);
+            transformableTextNodeCementVrm.TranslationController.Enabled = true;
+            transformableTextNodeCementVrm.TranslationController.TransformableNode.LocalPosition = new Vector3(0.9f, 0.3f, 0.0f);
+            transformableTextNodeCementVrm.ScaleController.Enabled = true;
+            transformableTextNodeCementVrm.ScaleController.TransformableNode.LocalScale = new Vector3(1.0f, 1.0f, 0.0f);
+            transformableTextNodeCementVrm.SetParent(AnchorNode);
         }
 
         public AnchorVisual(ArFragment arFragment, CloudSpatialAnchor cloudAnchor)
-            : this(arFragment, cloudAnchor.LocalAnchor , string.Empty)
+            : this(arFragment, cloudAnchor.LocalAnchor, string.Empty)
         {
             this.fragment = arFragment;
             CloudAnchor = cloudAnchor;
@@ -227,7 +271,7 @@ namespace NeudesicIC
         public void SetModelColor(Context context, int rgb, int key)
         {
             lock (this)
-            {                
+            {
                 MaterialFactory.MakeOpaqueWithColor(context, new Color(rgb)).ThenAccept(new ModelMaterialLoadedCallback(this.transformableNode, key));
             }
         }
@@ -236,7 +280,7 @@ namespace NeudesicIC
         {
             if (this.material != material)
             {
-                this.material = material;                
+                this.material = material;
             }
         }
 
@@ -254,10 +298,10 @@ namespace NeudesicIC
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 AnchorNode.Renderable = null;
-            AnchorNode.SetParent(null);
-            Anchor localAnchor = AnchorNode.Anchor;
-            if (localAnchor != null)
-            {
+                AnchorNode.SetParent(null);
+                Anchor localAnchor = AnchorNode.Anchor;
+                if (localAnchor != null)
+                {
                     AnchorNode.Anchor = null;
                     localAnchor.Detach();
                 }
@@ -274,7 +318,7 @@ namespace NeudesicIC
         }
 
         private void FinishLoading(ModelRenderable model)
-        {       
+        {
             transformableNode.Renderable = model;
             //MaterialFactory.MakeOpaqueWithColor(this.fragment.Context, new Color(Android.Graphics.Color.Red))
             //         .ThenAccept(new ModelRenderableLoadedCallback((ModelRenderable)transformableNode.Renderable));
@@ -282,19 +326,19 @@ namespace NeudesicIC
             //ApplyColorToChildNodes(transformableNode, Android.Graphics.Color.Red);
             //LoadTelemetry();
             // this.StartPlayer("//android_asset/hazard-alarm.mp3");
-           
+
             this.ModelLoaded?.Invoke(this, true);
         }
 
         private void ApplyColorToChildNodes(Node parentNode, int rgb)
         {
             Random randomGenerator = new Random();
-     
-            foreach(var partNumber in partNumbers)
+
+            foreach (var partNumber in partNumbers)
             {
-                SetModelColor(this.fragment.Context, Android.Graphics.Color.Green, partNumber);             
+                SetModelColor(this.fragment.Context, Android.Graphics.Color.Green, partNumber);
             }
-                            
+
             //for(int i = 0; i < transformableNode.Renderable.SubmeshCount; i++)
             //{
             //    transformableNode.Renderable.SetMaterial(i, solidColorModelMaterialCache[i]);
@@ -307,7 +351,7 @@ namespace NeudesicIC
             //        MaterialFactory.MakeOpaqueWithColor(this.fragment.Context, new Color(rgb))
             //           .ThenAccept(new ModelRenderableLoadedCallback((ModelRenderable)childNode.Renderable));
             //    }
-            
+
 
             //    // Recursive call to apply color to nested child nodes
             //    ApplyColorToChildNodes(childNode, rgb);
@@ -327,6 +371,18 @@ namespace NeudesicIC
 
         private void LoadTelemetry()
         {
+            if (SelectedModel != null && SelectedModel == "cement")
+            {
+                loadCementFactoryTelementry();
+            }
+            else
+            {
+                loadOilRigTelemetry();
+            }
+        }
+
+        private void loadOilRigTelemetry()
+        {
             using (HttpClient httpClient = new HttpClient())
             {
                 try
@@ -337,9 +393,9 @@ namespace NeudesicIC
 
                     if (response.IsSuccessStatusCode)
                     {
-                        string content =  response.Content.ReadAsStringAsync().Result;
+                        string content = response.Content.ReadAsStringAsync().Result;
                         System.Console.WriteLine(content);
-                        deviceTelemetries = JsonConvert.DeserializeObject<List<DeviceTelemetry>>(content);
+                        deviceTelemetries = JsonConvert.DeserializeObject<List<OilRigDeviceTelemetry>>(content);
                         bool isAnomalyFound = deviceTelemetries.Any((x) => x.ColorValue != 0);
                         foreach (var deviceTelemetry in deviceTelemetries)
                         {
@@ -368,7 +424,10 @@ namespace NeudesicIC
 
                         if (isAnomalyFound)
                         {
-                            this.PlayAudio();
+                            if (!playingAudio)
+                            {
+                                this.PlayAudio();
+                            }
                             LoadHazardGIF();
                         }
                         else
@@ -394,9 +453,170 @@ namespace NeudesicIC
             }
         }
 
+        //public static class cementFactoryComponents
+        //{
+        //    public const string kiln = "ap.039.001.kiln",
+        //        silo1 = "ap.039.001.silo1",
+        //        silo2 = "ap.039.001.silo1",
+        //        vrm = "ap.039.001.vrm";
+
+        //}
+
+        private void loadCementFactoryTelementry()
+        {
+
+            using (HttpClient httpClient = new HttpClient())
+            {
+                try
+                {
+                    string url = "https://cementfun.azurewebsites.net/api/GetTelimetryData"; // Example API endpoint
+
+                    HttpResponseMessage response = httpClient.GetAsync(url).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string content = response.Content.ReadAsStringAsync().Result;
+                        System.Console.WriteLine(content);
+                        cementFactoriyTelementry = JsonConvert.DeserializeObject<List<CementFactoryTelemetry>>(content);
+                        bool isAnomalyFound = cementFactoriyTelementry.Any((x) => x.DeviceTelemetries.Any(i => !i.Status));
+
+                        var kilnMetricsText = "Asset: ap.039.001.kiln\n";
+                        var silo1MetricsText = "Asset: ap.039.001.silo1\n";
+                        var silo2MetricsText = "Asset: ap.039.001.silo2\n";
+                        var vrmMetricsText = "Asset: ap.039.001.vrm\n";
+
+                        bool kilnAnamoly = false, silo1Anamoly = false, silo2Anamoly = false, vrmAnamoly = false;
+                        foreach (var item in cementFactoriyTelementry)
+                        {
+                            var str = GetCementMetricsString(item.DeviceTelemetries);
+                            if (item.Id.Contains("kiln"))
+                            {
+                                kilnMetricsText += str.Item1;
+                                if (str.Item2)
+                                {
+                                    kilnAnamoly = true;
+
+                                }
+                            }
+                            else if (item.Id.Contains("silo1"))
+                            {
+
+                                silo1MetricsText += str.Item1;
+                                if (str.Item2)
+                                {
+                                    silo1Anamoly = true;
+                                }
+                            }
+                            else if (item.Id.Contains("silo2"))
+                            {
+                                silo2MetricsText += str.Item1;
+                                if (str.Item2)
+                                {
+                                    silo2Anamoly = true;
+                                }
+                            }
+                            else if (item.Id.Contains("vrm"))
+                            {
+                                vrmMetricsText += str.Item1;
+                                if (str.Item2)
+                                {
+                                    vrmAnamoly = true;
+                                }
+                            }
+                        }
+
+                        if (kilnAnamoly)
+                        {
+                            SetCementModelColor("kiln", Android.Graphics.Color.Red);
+                        }
+                        if (silo1Anamoly)
+                        {
+                            SetCementModelColor("silo1", Android.Graphics.Color.Red);
+                        }
+                        if (silo2Anamoly)
+                        {
+                            SetCementModelColor("silo2", Android.Graphics.Color.Red);
+                        }
+                        if (vrmAnamoly)
+                        {
+                            SetCementModelColor("vrm", Android.Graphics.Color.Red);
+                        }
+
+
+                        LoadCementTelemetryPopups(Html.FromHtml(kilnMetricsText), Resource.Layout.cementKilnTelemetry, transformableTextNodeCementKiln);
+                        LoadCementTelemetryPopups(Html.FromHtml(silo1MetricsText), Resource.Layout.cementSilo1Telemetry, transformableTextNodeCementSilo1);
+                        LoadCementTelemetryPopups(Html.FromHtml(silo2MetricsText), Resource.Layout.cementSilo2Telemetry, transformableTextNodeCementSilo2);
+                        LoadCementTelemetryPopups(Html.FromHtml(silo2MetricsText), Resource.Layout.cementVrmTelemetry, transformableTextNodeCementVrm);
+                        IsModelLoaded = true;
+
+                        if (isAnomalyFound)
+                        {
+                            if (!playingAudio)
+                            {
+                                this.PlayAudio();
+                            }
+                            LoadHazardGIF();
+                        }
+                        else
+                        {
+                            this.StopAudio();
+                            UnLoadHazardGIF();
+                        }
+                    }
+                    else
+                    {
+                        System.Console.WriteLine($"HTTP request failed with status code: {response.StatusCode}");
+                    }
+
+                }
+                catch (System.Exception ex)
+                {
+                    System.Console.WriteLine($"An error occurred: {ex.Message}");
+                }
+
+            }
+
+        }
+
+        public void SetCementModelColor(string component, int color)
+        {
+            var count = transformableNode.Renderable.SubmeshCount;
+            for (int i = 0; i < count; i++)
+            {
+                var name = transformableNode.Renderable.GetSubmeshName(i);
+                if (name.Contains(component))
+                {
+                    SetModelColor(this.fragment.Context, color, i);
+                }
+
+            }
+
+        }
+
+
+        public (string, bool) GetCementMetricsString(List<DeviceTelemetry> deviceTelemetries)
+        {
+            var metrics = "";
+            var anamolyFound = false;
+
+            foreach (var deviceTelemetry in deviceTelemetries)
+            {
+                if (deviceTelemetry.Status)
+                {
+                    metrics += "<font color=\"Red\">" + deviceTelemetry.Property + ": " + deviceTelemetry.Value + " " + deviceTelemetry.Unit + "</font>" + "\n";
+                    anamolyFound = true;
+                }
+                else
+                {
+                    metrics += deviceTelemetry.Property + ": " + deviceTelemetry.Value + " " + deviceTelemetry.Unit + "\n";
+                }
+            }
+            return (metrics, anamolyFound);
+        }
+
         private void LoadGlb()
         {
-            var uri = SelectedModel == "cement" ? Android.Net.Uri.FromFile(new File("//android_asset/cementfactory.glb"))
+            var uri = SelectedModel == "cement" ? Android.Net.Uri.FromFile(new File("//android_asset/cement.glb"))
                 : Android.Net.Uri.FromFile(new File("//android_asset/oil.glb"));
 
             Render3DModel(uri);
@@ -473,8 +693,7 @@ namespace NeudesicIC
         }
 
         private void LoadTelemetryValue()
-        {           
-            IsModelLoaded = true;
+        {
             var builder_D = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.DepthTelemetry);
             builder_D.Build(FinishLoadingText_D);
 
@@ -488,7 +707,24 @@ namespace NeudesicIC
             builder_F.Build(FinishLoadingText_F);
         }
 
-        private void UpdateTelemetryValue(DeviceTelemetry telimetry, int key)
+
+        private void LoadCementTelemetryPopups(ISpanned text, int androidResourceId, TransformableNode tn)
+        {
+            if (!IsModelLoaded)
+            {
+                var builder_D = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, androidResourceId);
+                builder_D.Build((ViewRenderable) => { FinishLoadingCementTelemetryPopups(ViewRenderable, text, tn); });
+            }
+            else
+            {
+                var renderableView = (ViewRenderable)tn.Renderable;
+                var textView = (TextView)renderableView.View;
+                textView.SetText(text, TextView.BufferType.Normal);
+            }
+
+        }
+
+        private void UpdateTelemetryValue(OilRigDeviceTelemetry telimetry, int key)
         {
             if (IsModelLoaded)
             {
@@ -496,14 +732,21 @@ namespace NeudesicIC
                 {
                     var renderableView = (ViewRenderable)transformableTextNodeDep.Renderable;
                     var textView = (TextView)renderableView.View;
-                    textView.SetText("Asset : kb1.001.depth" + "\n" + telimetry.Property + ":" + telimetry.Value.ToString(), TextView.BufferType.Normal);
+                    var htmlText = Html.FromHtml("Asset: kb1.001.depth" + "\n" + "<font  color=\"Green\">" + telimetry.Property + ":" + telimetry.Value.ToString() + "</font>");
+                    textView.SetText(htmlText, TextView.BufferType.Normal);
+
                 }
 
                 if (key == 9)
                 {
                     var renderableView = (ViewRenderable)transformableTextNodeGas.Renderable;
                     var textView = (TextView)renderableView.View;
-                    textView.SetText("Asset : kb1.001.gasdetection" + "\n" + telimetry.Property + ":" + telimetry.Value.ToString(), TextView.BufferType.Normal);
+                    var htmlText = Html.FromHtml("Asset : kb1.001.gasdetection" + "\n" + "<font  color=\"White\">" + telimetry.Property + ":" + telimetry.Value.ToString() + "</font>");
+
+
+                    textView.SetText(htmlText, TextView.BufferType.Normal);
+
+                    //textView.SetText("Asset : kb1.001.gasdetection" + "\n" + telimetry.Property + ":" + telimetry.Value.ToString(), TextView.BufferType.Normal);
                 }
 
                 if (key == 8)
@@ -533,9 +776,9 @@ namespace NeudesicIC
             var telimetry = deviceTelemetries.Where(k => k.Id == "kb1.001.depth").FirstOrDefault();
             if (telimetry != null)
             {
-                transformableTextNodeDep.Renderable = model;              
+                transformableTextNodeDep.Renderable = model;
                 TextView textView = (TextView)model.View;
-                textView.SetText("Asset : kb1.001.depth" + "\n" + telimetry.Property +":"+ telimetry.Value.ToString() , TextView.BufferType.Normal);
+                textView.SetText("Asset : kb1.001.depth" + "\n" + telimetry.Property + ":" + telimetry.Value.ToString(), TextView.BufferType.Normal);
                 textView.SetBackgroundResource(Resource.Drawable.yellowr);
                 this.transformableNode.AddChild(transformableTextNodeDep);
             }
@@ -579,7 +822,19 @@ namespace NeudesicIC
                 this.transformableNode.AddChild(transformableTextNodeFlo);
             }
         }
-        
+
+        private void FinishLoadingCementTelemetryPopups(ViewRenderable model, ISpanned text, TransformableNode tn)
+        {
+
+            if (text != null)
+            {
+                tn.Renderable = model;
+                TextView textView = (TextView)model.View;
+                textView.SetText(text, TextView.BufferType.Normal);
+                textView.SetBackgroundResource(Resource.Drawable.bubble_yellow);
+                this.transformableNode.AddChild(tn);
+            }
+        }
         private void LoadHazardGIF()
         {
             var builder = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.hazardElement);
@@ -594,11 +849,11 @@ namespace NeudesicIC
 
         private int GetColorValue(int flagId)
         {
-            if(flagId == 0)
+            if (flagId == 0)
             {
                 return Android.Graphics.Color.Green;
             }
-            else if(flagId == 1)
+            else if (flagId == 1)
             {
                 return 16760576;
             }
@@ -608,8 +863,10 @@ namespace NeudesicIC
             }
         }
 
+        private bool playingAudio;
         public void PlayAudio()
         {
+            playingAudio = true;
             Intent serviceIntent = new Intent(this.fragment.Context, typeof(AudioService));
             serviceIntent.PutExtra("AudioUri", "filepath");
             this.fragment.Context.StartService(serviceIntent);
@@ -617,17 +874,47 @@ namespace NeudesicIC
 
         public void StopAudio()
         {
+            playingAudio = false;
             Intent stopIntent = new Intent("StopAudioAction");
             this.fragment.Context.SendBroadcast(stopIntent);
         }
 
     }
 
-    public class DeviceTelemetry
+    public class OilRigDeviceTelemetry
     {
         public string Id { get; set; }
         public int ColorValue { get; set; }
         public string Property { get; set; }
         public decimal Value { get; set; }
     }
+
+
+    public class CementFactoryTelemetry
+    {
+        public string Id { get; set; }
+        public List<DeviceTelemetry> DeviceTelemetries { get; set; }
+
+    }
+
+    public class DeviceTelemetry
+    {
+        public bool Status { get; set; }
+        public string Property { get; set; }
+        public double Value { get; set; }
+        public string Unit { get; set; }
+    }
+
+
+    //public class CementAgrregatedTelemetry
+    //{
+    //    CementAgrregatedTelemetry(CementFactoryTelemetry tel)
+    //    {
+
+    //    }
+
+    //    public string Id { get; set; }
+
+    //    public string Property { get; set; }
+    //}
 }

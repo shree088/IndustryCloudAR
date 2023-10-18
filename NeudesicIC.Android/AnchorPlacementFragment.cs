@@ -77,7 +77,7 @@ namespace NeudesicIC
             syncTelemetryButton = view.FindViewById<Button>(Resource.Id.confirm_placement);
             syncTelemetryButton.Visibility = ViewStates.Invisible;
 
-            if (SelectedModel == "oilrig")
+            if (true ||  SelectedModel == "oilrig")
             {
                 syncTelemetryButton.Visibility = ViewStates.Visible;
             }
@@ -88,7 +88,7 @@ namespace NeudesicIC
         public override void OnStart()
         {
             base.OnStart();
-            if (SelectedModel == "oilrig")
+            if (true || SelectedModel == "oilrig")
             {
                 syncTelemetryButton.Enabled = false;
                 syncTelemetryButton.SetOnClickListener(this);
@@ -138,10 +138,9 @@ namespace NeudesicIC
 
         private void Visual_ModelLoaded(object sender, bool e)
         {
-            if (SelectedModel == "oilrig")
-            {
+           
                 syncTelemetryButton.Enabled = true;
-            }
+           
         }
 
         void IOnCheckedChangeListener.OnCheckedChanged(RadioGroup radioGroup, int selectedId)
@@ -156,12 +155,12 @@ namespace NeudesicIC
 
         public void OnClick(View view)
         {
-            if (visual != null && SelectedModel == "oilrig" )
+            if (visual != null )
             {
                 syncTelemetryButton.Enabled = false;
                 visual.Fetch_LoadTelemetry();
                 syncTelemetryButton.Enabled = true;
-                timer = new Timer(TimerCallback, null, TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(20));
+                //timer = new Timer(TimerCallback, null, TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(20));
                 //AnchorVisual placedAnchor = visual;
                 //visual = null;
                 //placedAnchor.IsMovable = false;
@@ -172,7 +171,7 @@ namespace NeudesicIC
         private void TimerCallback(object state)
         {
             Console.WriteLine($"Timer callback executed at: {DateTime.Now}");
-            if (visual != null && SelectedModel == "oilrig")
+            if (visual != null )
             {
                 visual.Fetch_LoadTelemetry();
             }
