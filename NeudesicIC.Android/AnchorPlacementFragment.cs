@@ -160,11 +160,7 @@ namespace NeudesicIC
                 syncTelemetryButton.Enabled = false;
                 visual.Fetch_LoadTelemetry();
                 syncTelemetryButton.Enabled = true;
-                //timer = new Timer(TimerCallback, null, TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(20));
-                //AnchorVisual placedAnchor = visual;
-                //visual = null;
-                //placedAnchor.IsMovable = false;
-                //OnAnchorPlaced?.Invoke(placedAnchor);
+                timer = new Timer(TimerCallback, null, TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(20));               
             }
         }
 
@@ -174,8 +170,7 @@ namespace NeudesicIC
             if (visual != null )
             {
                 visual.Fetch_LoadTelemetry();
-            }
-            
+            }            
         }
     }
 }
