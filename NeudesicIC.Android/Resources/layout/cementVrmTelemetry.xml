@@ -7,7 +7,7 @@
     android:textColor="@android:color/black"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="6dp"
+    android:padding="10dp"
     android:text="Getting VRM Telemetry"
     android:singleLine="false" 
     android:maxLines="2" 

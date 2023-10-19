@@ -107,6 +107,7 @@ namespace NeudesicIC
         private static Dictionary<int, CompletableFuture> solidColorMaterialCache = new Dictionary<int, CompletableFuture>();
         public static Dictionary<int, Material> solidColorModelMaterialCache = new Dictionary<int, Material>();
         public static Dictionary<int, Material> solidColorInitialMaterialCache = new Dictionary<int, Material>();
+        public static Dictionary<int, Material> originalMaterialCache = new Dictionary<int, Material>();
         public event EventHandler<bool> ModelLoaded;
         public MediaPlayer mediaPlayer;
         List<OilRigDeviceTelemetry> deviceTelemetries;
@@ -138,6 +139,7 @@ namespace NeudesicIC
                 transformableNode.ScaleController.MinScale = 0.2f;
                 transformableNode.ScaleController.MaxScale = 2.0f;
                 transformableNode.ScaleController.TransformableNode.LocalScale = new Vector3(0.3f, 0.3f, 0.3f);
+                //transformableNode.ScaleController.TransformableNode.LocalRotation = new Quaternion(new Vector3(0.0f, -90.0f, 0f));
                 transformableNode.LocalPosition = new Vector3(0.0f, 0.5f, 0.0f);
             }
             else
@@ -200,14 +202,15 @@ namespace NeudesicIC
         {
             transformableTextNodeCementKiln = new TransformableNode(fragment.TransformationSystem);
             transformableTextNodeCementKiln.TranslationController.Enabled = true;
-            transformableTextNodeCementKiln.TranslationController.TransformableNode.LocalPosition = new Vector3(0.7f, 0.6f, 0.0f);
+            transformableTextNodeCementKiln.TranslationController.TransformableNode.LocalPosition = new Vector3(1.1f, 0.3f, 0.5f);
+            transformableTextNodeCementKiln.TranslationController.TransformableNode.LocalRotation = new Quaternion(new Vector3(0.0f, 0.0f, 0.0f));
             transformableTextNodeCementKiln.ScaleController.Enabled = true;
             transformableTextNodeCementKiln.ScaleController.TransformableNode.LocalScale = new Vector3(1.0f, 1.0f, 0.0f);
             transformableTextNodeCementKiln.SetParent(AnchorNode);
 
             transformableTextNodeCementSilo1 = new TransformableNode(fragment.TransformationSystem);
             transformableTextNodeCementSilo1.TranslationController.Enabled = true;
-            transformableTextNodeCementSilo1.TranslationController.TransformableNode.LocalPosition = new Vector3(0.1f, 0.2f, 0.0f);
+            transformableTextNodeCementSilo1.TranslationController.TransformableNode.LocalPosition = new Vector3(-1.1f, 0.9f, 0.0f);
             transformableTextNodeCementSilo1.ScaleController.Enabled = true;
             transformableTextNodeCementSilo1.ScaleController.TransformableNode.LocalScale = new Vector3(1.0f, 1.0f, 0.0f);
             transformableTextNodeCementSilo1.SetParent(AnchorNode);
@@ -215,7 +218,7 @@ namespace NeudesicIC
 
             transformableTextNodeCementSilo2 = new TransformableNode(fragment.TransformationSystem);
             transformableTextNodeCementSilo2.TranslationController.Enabled = true;
-            transformableTextNodeCementSilo2.TranslationController.TransformableNode.LocalPosition = new Vector3(0.2f, 0.5f, 0.0f);
+            transformableTextNodeCementSilo2.TranslationController.TransformableNode.LocalPosition = new Vector3(-1.1f, 0.6f, 0.4f);
             transformableTextNodeCementSilo2.ScaleController.Enabled = true;
             transformableTextNodeCementSilo2.ScaleController.TransformableNode.LocalScale = new Vector3(1.0f, 1.0f, 0.0f);
             transformableTextNodeCementSilo2.SetParent(AnchorNode);
@@ -223,7 +226,7 @@ namespace NeudesicIC
 
             transformableTextNodeCementVrm = new TransformableNode(fragment.TransformationSystem);
             transformableTextNodeCementVrm.TranslationController.Enabled = true;
-            transformableTextNodeCementVrm.TranslationController.TransformableNode.LocalPosition = new Vector3(0.9f, 0.3f, 0.0f);
+            transformableTextNodeCementVrm.TranslationController.TransformableNode.LocalPosition = new Vector3(1.0f, 0.5f, -0.6f);
             transformableTextNodeCementVrm.ScaleController.Enabled = true;
             transformableTextNodeCementVrm.ScaleController.TransformableNode.LocalScale = new Vector3(1.0f, 1.0f, 0.0f);
             transformableTextNodeCementVrm.SetParent(AnchorNode);
@@ -306,6 +309,7 @@ namespace NeudesicIC
         {
             lock (this)
             {
+                AnchorVisual.originalMaterialCache[key] = this.transformableNode.Renderable.GetMaterial(key);
                 MaterialFactory.MakeOpaqueWithColor(context, new Color(rgb)).ThenAccept(new ModelMaterialLoadedCallback(this.transformableNode, key));
             }
         }
@@ -502,13 +506,13 @@ namespace NeudesicIC
                         string content = response.Content.ReadAsStringAsync().Result;
                         System.Console.WriteLine(content);
                         var cementFactoriyTelementry = JsonConvert.DeserializeObject<List<CementFactoryTelemetry>>(content);
-                        bool isAnomalyFound = cementFactoriyTelementry.Any((x) => x.DeviceTelemetries.Any(i => i.Status));
 
-                        var kilnMetricsText = "Asset: ap.039.001.kiln\n";
-                        var silo1MetricsText = "Asset: ap.039.001.silo1\n";
-                        var silo2MetricsText = "Asset: ap.039.001.silo2\n";
-                        var vrmMetricsText = "Asset: ap.039.001.vrm\n";
+                        var kilnMetricsText = "Asset: ap.039.001.kiln <br/>";
+                        var silo1MetricsText = "Asset: ap.039.001.silo1 <br/>";
+                        var silo2MetricsText = "Asset: ap.039.001.silo2 <br/>";
+                        var vrmMetricsText = "Asset: ap.039.001.vrm <br/>";
 
+                        bool kilnAnamoly = false, silo1Anamoly = false, silo2Anamoly = false, vrmAnamoly = false;
                         foreach (var item in cementFactoriyTelementry)
                         {
                             var str = GetCementMetricsString(item.DeviceTelemetries);
@@ -517,15 +521,17 @@ namespace NeudesicIC
                                 kilnMetricsText += str.Item1;
                                 if (str.Item2)
                                 {
-                                    SetCementModelColor("kiln", Android.Graphics.Color.Red);
+                                    kilnAnamoly = true;
+
                                 }
                             }
                             else if (item.Id.Contains("silo1"))
                             {
+
                                 silo1MetricsText += str.Item1;
                                 if (str.Item2)
                                 {
-                                    SetCementModelColor("silo1", Android.Graphics.Color.Red);
+                                    silo1Anamoly = true;
                                 }
                             }
                             else if (item.Id.Contains("silo2"))
@@ -533,7 +539,7 @@ namespace NeudesicIC
                                 silo2MetricsText += str.Item1;
                                 if (str.Item2)
                                 {
-                                    SetCementModelColor("silo2", Android.Graphics.Color.Red);
+                                    silo2Anamoly = true;
                                 }
                             }
                             else if (item.Id.Contains("vrm"))
@@ -541,18 +547,24 @@ namespace NeudesicIC
                                 vrmMetricsText += str.Item1;
                                 if (str.Item2)
                                 {
-                                    SetCementModelColor("vrm", Android.Graphics.Color.Red);
+                                    vrmAnamoly = true;
                                 }
                             }
                         }
 
+
+                        SetCementComponentsColor("kiln", Android.Graphics.Color.Red, kilnAnamoly);
+                        SetCementComponentsColor("silo-1", Android.Graphics.Color.Red, silo1Anamoly);
+                        SetCementComponentsColor("silo-2", Android.Graphics.Color.Red, silo2Anamoly);
+                        SetCementComponentsColor("vrm", Android.Graphics.Color.Red, vrmAnamoly);
+                        
                         LoadCementTelemetryPopups(Html.FromHtml(kilnMetricsText), Resource.Layout.cementKilnTelemetry, transformableTextNodeCementKiln);
                         LoadCementTelemetryPopups(Html.FromHtml(silo1MetricsText), Resource.Layout.cementSilo1Telemetry, transformableTextNodeCementSilo1);
                         LoadCementTelemetryPopups(Html.FromHtml(silo2MetricsText), Resource.Layout.cementSilo2Telemetry, transformableTextNodeCementSilo2);
-                        LoadCementTelemetryPopups(Html.FromHtml(silo2MetricsText), Resource.Layout.cementVrmTelemetry, transformableTextNodeCementVrm);
+                        LoadCementTelemetryPopups(Html.FromHtml(vrmMetricsText), Resource.Layout.cementVrmTelemetry, transformableTextNodeCementVrm);
                         IsModelLoaded = true;
 
-                        if (isAnomalyFound)
+                        if (kilnAnamoly || silo1Anamoly || silo2Anamoly || vrmAnamoly)
                         {
                             if (!playingAudio)
                             {
@@ -579,14 +591,22 @@ namespace NeudesicIC
             }
         }
 
-        public void SetCementModelColor(string component, int color)
+        public void SetCementComponentsColor(string component, int color, bool anamolyFound)
         {
             for (int i = 0; i < transformableNode.Renderable.SubmeshCount; i++)
             {
                 var name = transformableNode.Renderable.GetSubmeshName(i);
                 if (name.Contains(component))
                 {
-                    SetModelColor(this.fragment.Context, color, i);
+                    if (anamolyFound)
+                    {
+                        SetModelColor(this.fragment.Context, color, i);
+                    }
+                    else if (AnchorVisual.originalMaterialCache.ContainsKey(i))
+                    {
+                        this.transformableNode.Renderable.SetMaterial(i, AnchorVisual.originalMaterialCache[i]);
+                        AnchorVisual.originalMaterialCache.Remove(i);
+                    }
                 }
             }
         }
@@ -600,12 +620,12 @@ namespace NeudesicIC
             {
                 if (deviceTelemetry.Status)
                 {
-                    metrics += "<font color=\"Red\">" + deviceTelemetry.Property + ": " + deviceTelemetry.Value + " " + deviceTelemetry.Unit + "</font>" + "\n";
+                    metrics += "<font color=\"Red\">" + deviceTelemetry.Property + ": " + deviceTelemetry.Value + " " + deviceTelemetry.Unit + "</font>" + "<br/>";
                     anamolyFound = true;
                 }
                 else
                 {
-                    metrics += deviceTelemetry.Property + ": " + deviceTelemetry.Value + " " + deviceTelemetry.Unit + "\n";
+                    metrics += deviceTelemetry.Property + ": " + deviceTelemetry.Value + " " + deviceTelemetry.Unit + "<br/>";
                 }
             }
             return (metrics, anamolyFound);
@@ -776,7 +796,7 @@ namespace NeudesicIC
                 tn.Renderable = model;
                 TextView textView = (TextView)model.View;
                 textView.SetText(text, TextView.BufferType.Normal);
-                textView.SetBackgroundResource(Resource.Drawable.bubble_yellow);
+                //textView.SetBackgroundResource(Resource.Drawable.bubble_yellow);
                 this.transformableNode.AddChild(tn);
             }
         }
