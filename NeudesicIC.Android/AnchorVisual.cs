@@ -12,6 +12,7 @@ using Google.AR.Sceneform.Math;
 using Google.AR.Sceneform.Rendering;
 using Google.AR.Sceneform.UX;
 using Java.IO;
+using Java.Lang;
 using Java.Util.Concurrent;
 using Java.Util.Functions;
 using Microsoft.Azure.SpatialAnchors;
@@ -20,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Xamarin.Essentials;
 
 namespace NeudesicIC
@@ -95,6 +97,11 @@ namespace NeudesicIC
         private TransformableNode transformableTextNodeFlo;
         private TransformableNode transformableGifNode;
 
+        private TransformableNode tnCementKilnGif;
+        private TransformableNode tnCementSilo1Gif;
+        private TransformableNode tnCementSilo2Gif;
+        private TransformableNode tnCementVrmGif;
+
         private TransformableNode transformableTextNodeCementKiln;
         private TransformableNode transformableTextNodeCementSilo1;
         private TransformableNode transformableTextNodeCementSilo2;
@@ -126,7 +133,7 @@ namespace NeudesicIC
 
             NeudesicICDemoNode(this.fragment);
 
-            AddCementPopupNodes(this.fragment);
+            
         }
 
         private void Add3DModelNode(ArFragment arFragment, string selectedModel)
@@ -141,6 +148,18 @@ namespace NeudesicIC
                 transformableNode.ScaleController.TransformableNode.LocalScale = new Vector3(0.3f, 0.3f, 0.3f);
                 //transformableNode.ScaleController.TransformableNode.LocalRotation = new Quaternion(new Vector3(0.0f, -90.0f, 0f));
                 transformableNode.LocalPosition = new Vector3(0.0f, 0.5f, 0.0f);
+
+                AddCementPopupNodes(this.fragment);
+
+                this.tnCementKilnGif = new TransformableNode(arFragment.TransformationSystem);
+                this.tnCementSilo1Gif = new TransformableNode(arFragment.TransformationSystem);
+                this.tnCementSilo2Gif = new TransformableNode(arFragment.TransformationSystem);
+                this.tnCementVrmGif = new TransformableNode(arFragment.TransformationSystem);
+                AddAnamalyGifNodeForCement(this.fragment, tnCementKilnGif, new Vector3(1.1f, 0.1f, 0.5f));
+                AddAnamalyGifNodeForCement(this.fragment, tnCementSilo1Gif, new Vector3(-1.1f, 0.7f, 0.0f));
+                AddAnamalyGifNodeForCement(this.fragment, tnCementSilo2Gif, new  Vector3(-1.1f, 0.4f, 0.4f));
+                AddAnamalyGifNodeForCement(this.fragment, tnCementVrmGif, new Vector3(1.0f, 0.3f, -0.6f));
+
             }
             else
             {
@@ -165,6 +184,20 @@ namespace NeudesicIC
             transformableGifNode.SetParent(AnchorNode);
             transformableNode.AddChild(transformableGifNode);
         }
+
+        private void AddAnamalyGifNodeForCement(ArFragment arFragment, TransformableNode tn, Vector3 localPosition )
+        {
+            tn.TranslationController.Enabled = true;
+            tn.TranslationController.TransformableNode.LocalPosition = localPosition;
+            tn.ScaleController.Enabled = true;
+            tn.ScaleController.MinScale = 0.1f;
+            tn.ScaleController.MaxScale = 0.4f;
+            tn.ScaleController.TransformableNode.LocalScale = new Vector3(0.1f, 0.1f, 0.1f);
+            tn.SetParent(AnchorNode);
+            transformableNode.AddChild(tn);
+        }
+
+
 
         public void AddOilRigPopupNodes(ArFragment fragment)
         {
@@ -407,19 +440,19 @@ namespace NeudesicIC
             MainThread.BeginInvokeOnMainThread(LoadTelemetry);
         }
 
-        private void LoadTelemetry()
+        private async void LoadTelemetry()
         {
             if (SelectedModel != null && SelectedModel == "cement")
             {
-                loadCementFactoryTelementry();
+                await loadCementFactoryTelementry();
             }
             else
             {
-                loadOilRigTelemetry();
+                await loadOilRigTelemetry();
             }
         }
 
-        private void loadOilRigTelemetry()
+        private async Task loadOilRigTelemetry()
         {
             using (HttpClient httpClient = new HttpClient())
             {
@@ -427,7 +460,7 @@ namespace NeudesicIC
                 {
                     string url = "https://dt-twin-api.azurewebsites.net/api/GetTelimetryData?"; // Example API endpoint
 
-                    HttpResponseMessage response = httpClient.GetAsync(url).Result;
+                    HttpResponseMessage response =await  httpClient.GetAsync(url);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -490,7 +523,7 @@ namespace NeudesicIC
             }
         }
 
-        private void loadCementFactoryTelementry()
+        private async Task loadCementFactoryTelementry()
         {
 
             using (HttpClient httpClient = new HttpClient())
@@ -499,7 +532,7 @@ namespace NeudesicIC
                 {
                     string url = "https://cementfun.azurewebsites.net/api/GetTelimetryData"; // Example API endpoint
 
-                    HttpResponseMessage response = httpClient.GetAsync(url).Result;
+                    HttpResponseMessage response = await httpClient.GetAsync(url);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -558,24 +591,22 @@ namespace NeudesicIC
                         SetCementComponentsColor("silo-2", Android.Graphics.Color.Red, silo2Anamoly);
                         SetCementComponentsColor("vrm", Android.Graphics.Color.Red, vrmAnamoly);
                         
-                        LoadCementTelemetryPopups(Html.FromHtml(kilnMetricsText), Resource.Layout.cementKilnTelemetry, transformableTextNodeCementKiln);
-                        LoadCementTelemetryPopups(Html.FromHtml(silo1MetricsText), Resource.Layout.cementSilo1Telemetry, transformableTextNodeCementSilo1);
-                        LoadCementTelemetryPopups(Html.FromHtml(silo2MetricsText), Resource.Layout.cementSilo2Telemetry, transformableTextNodeCementSilo2);
-                        LoadCementTelemetryPopups(Html.FromHtml(vrmMetricsText), Resource.Layout.cementVrmTelemetry, transformableTextNodeCementVrm);
+                        LoadCementTelemetryPopups(Html.FromHtml(kilnMetricsText), Resource.Layout.cementKilnTelemetry, transformableTextNodeCementKiln, kilnAnamoly, tnCementKilnGif);
+                        LoadCementTelemetryPopups(Html.FromHtml(silo1MetricsText), Resource.Layout.cementSilo1Telemetry, transformableTextNodeCementSilo1, silo1Anamoly, tnCementSilo1Gif);
+                        LoadCementTelemetryPopups(Html.FromHtml(silo2MetricsText), Resource.Layout.cementSilo2Telemetry, transformableTextNodeCementSilo2, silo2Anamoly, tnCementSilo2Gif);
+                        LoadCementTelemetryPopups(Html.FromHtml(vrmMetricsText), Resource.Layout.cementVrmTelemetry, transformableTextNodeCementVrm, vrmAnamoly, tnCementVrmGif);
                         IsModelLoaded = true;
-
+                        
                         if (kilnAnamoly || silo1Anamoly || silo2Anamoly || vrmAnamoly)
                         {
                             if (!playingAudio)
                             {
                                 this.PlayAudio();
                             }
-                            LoadHazardGIF();
                         }
                         else
                         {
                             this.StopAudio();
-                            UnLoadHazardGIF();
                         }
                     }
                     else
@@ -681,7 +712,7 @@ namespace NeudesicIC
             builder_F.Build(FinishLoadingText_F);
         }
 
-        private void LoadCementTelemetryPopups(ISpanned text, int androidResourceId, TransformableNode tn)
+        private void LoadCementTelemetryPopups(ISpanned text, int androidResourceId, TransformableNode tn, bool anamolyFound, TransformableNode gifTranformableNode )
         {
             if (!IsModelLoaded)
             {
@@ -693,6 +724,15 @@ namespace NeudesicIC
                 var renderableView = (ViewRenderable)tn.Renderable;
                 var textView = (TextView)renderableView.View;
                 textView.SetText(text, TextView.BufferType.Normal);
+            }
+
+            if(anamolyFound)
+            {
+                LoadCementHazardGIF(gifTranformableNode);
+            }
+            else
+            {
+                UnLoadCementHazardGIF(gifTranformableNode);
             }
         }
 
@@ -805,6 +845,20 @@ namespace NeudesicIC
             var builder = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.hazardElement);
 
             builder.Build(FinishLoadingGIF);
+        }
+
+        private void LoadCementHazardGIF(TransformableNode tn)
+        {
+            var builder = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, Resource.Layout.hazardElement);
+
+            builder.Build((ViewRenderable model) => tn.Renderable = model);
+        }
+        private void UnLoadCementHazardGIF(TransformableNode tn)
+        {
+            if (tn != null)
+            {
+                tn.Renderable = null;
+            }
         }
 
         private void UnLoadHazardGIF()

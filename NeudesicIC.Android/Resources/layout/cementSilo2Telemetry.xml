@@ -10,6 +10,6 @@
     android:padding="10dp"
     android:text="Getting Silo 2 Telemetry"
     android:singleLine="false" 
-    android:maxLines="2" 
+    android:maxLines="10" 
     android:textAlignment="center"
     android:background="@drawable/bubble_yellow"/>

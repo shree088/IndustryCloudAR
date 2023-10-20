@@ -24,6 +24,7 @@ namespace NeudesicIC
             if (!string.IsNullOrEmpty(audioUri))
             {
                 mediaPlayer = MediaPlayer.Create(this, Resource.Raw.hazard_alarm);
+                mediaPlayer.Looping = true;
                 mediaPlayer.Start();
 
                 // Ensure the service continues running in the background
