@@ -39,6 +39,7 @@ namespace NeudesicIC
 
         public override void OnDestroy()
         {
+            StopAudio();
             base.OnDestroy();
 
             UnregisterReceiver(stopAudioReceiver);

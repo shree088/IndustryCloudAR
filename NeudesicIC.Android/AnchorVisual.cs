@@ -370,6 +370,7 @@ namespace NeudesicIC
             {
                 AnchorNode.Renderable = null;
                 AnchorNode.SetParent(null);
+                this.StopAudio();
                 Anchor localAnchor = AnchorNode.Anchor;
                 if (localAnchor != null)
                 {
@@ -890,6 +891,8 @@ namespace NeudesicIC
             serviceIntent.PutExtra("AudioUri", "filepath");
             this.fragment.Context.StartService(serviceIntent);
         }
+
+        
 
         public void StopAudio()
         {
