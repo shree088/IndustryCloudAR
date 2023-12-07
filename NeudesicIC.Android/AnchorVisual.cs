@@ -262,7 +262,7 @@ namespace NeudesicIC
 
             transformableTextNodeCementSilo3 = new TransformableNode(fragment.TransformationSystem);
             transformableTextNodeCementSilo3.TranslationController.Enabled = true;
-            transformableTextNodeCementSilo3.TranslationController.TransformableNode.LocalPosition = new Vector3(-0.7f, 0.7f, -0.3f);
+            transformableTextNodeCementSilo3.TranslationController.TransformableNode.LocalPosition = new Vector3(-0.8f, 0.8f, -0.3f);
             transformableTextNodeCementSilo3.ScaleController.Enabled = true;
             transformableTextNodeCementSilo3.ScaleController.TransformableNode.LocalScale = new Vector3(1.0f, 1.0f, 0.0f);
             transformableTextNodeCementSilo3.SetParent(AnchorNode);
