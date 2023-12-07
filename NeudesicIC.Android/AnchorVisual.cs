@@ -100,11 +100,13 @@ namespace NeudesicIC
         private TransformableNode tnCementKilnGif;
         private TransformableNode tnCementSilo1Gif;
         private TransformableNode tnCementSilo2Gif;
+        private TransformableNode tnCementSilo3Gif;
         private TransformableNode tnCementVrmGif;
 
         private TransformableNode transformableTextNodeCementKiln;
         private TransformableNode transformableTextNodeCementSilo1;
         private TransformableNode transformableTextNodeCementSilo2;
+        private TransformableNode transformableTextNodeCementSilo3;
         private TransformableNode transformableTextNodeCementVrm;
 
         private NamedShape shape = NamedShape.Sphere;
@@ -154,10 +156,12 @@ namespace NeudesicIC
                 this.tnCementKilnGif = new TransformableNode(arFragment.TransformationSystem);
                 this.tnCementSilo1Gif = new TransformableNode(arFragment.TransformationSystem);
                 this.tnCementSilo2Gif = new TransformableNode(arFragment.TransformationSystem);
+                this.tnCementSilo3Gif = new TransformableNode(arFragment.TransformationSystem);
                 this.tnCementVrmGif = new TransformableNode(arFragment.TransformationSystem);
                 AddAnamalyGifNodeForCement(this.fragment, tnCementKilnGif, new Vector3(1.1f, 0.1f, 0.5f));
                 AddAnamalyGifNodeForCement(this.fragment, tnCementSilo1Gif, new Vector3(-1.1f, 0.7f, 0.0f));
                 AddAnamalyGifNodeForCement(this.fragment, tnCementSilo2Gif, new  Vector3(-1.1f, 0.4f, 0.4f));
+                AddAnamalyGifNodeForCement(this.fragment, tnCementSilo3Gif, new Vector3(-0.5f, 0.5f, -0.2f));
                 AddAnamalyGifNodeForCement(this.fragment, tnCementVrmGif, new Vector3(1.0f, 0.3f, -0.6f));
 
             }
@@ -237,30 +241,37 @@ namespace NeudesicIC
             transformableTextNodeCementKiln.TranslationController.Enabled = true;
             transformableTextNodeCementKiln.TranslationController.TransformableNode.LocalPosition = new Vector3(1.1f, 0.3f, 0.5f);
             transformableTextNodeCementKiln.TranslationController.TransformableNode.LocalRotation = new Quaternion(new Vector3(0.0f, 0.0f, 0.0f));
-            transformableTextNodeCementKiln.ScaleController.Enabled = true;
+            transformableTextNodeCementKiln.ScaleController.Enabled = false;
             transformableTextNodeCementKiln.ScaleController.TransformableNode.LocalScale = new Vector3(1.0f, 1.0f, 0.0f);
             transformableTextNodeCementKiln.SetParent(AnchorNode);
 
             transformableTextNodeCementSilo1 = new TransformableNode(fragment.TransformationSystem);
             transformableTextNodeCementSilo1.TranslationController.Enabled = true;
-            transformableTextNodeCementSilo1.TranslationController.TransformableNode.LocalPosition = new Vector3(-1.1f, 0.9f, 0.0f);
-            transformableTextNodeCementSilo1.ScaleController.Enabled = true;
+            transformableTextNodeCementSilo1.TranslationController.TransformableNode.LocalPosition = new Vector3(-1.1f, 0.8f, 0.0f);
+            transformableTextNodeCementSilo1.ScaleController.Enabled = false;
             transformableTextNodeCementSilo1.ScaleController.TransformableNode.LocalScale = new Vector3(1.0f, 1.0f, 0.0f);
             transformableTextNodeCementSilo1.SetParent(AnchorNode);
 
 
             transformableTextNodeCementSilo2 = new TransformableNode(fragment.TransformationSystem);
             transformableTextNodeCementSilo2.TranslationController.Enabled = true;
-            transformableTextNodeCementSilo2.TranslationController.TransformableNode.LocalPosition = new Vector3(-1.1f, 0.6f, 0.4f);
-            transformableTextNodeCementSilo2.ScaleController.Enabled = true;
+            transformableTextNodeCementSilo2.TranslationController.TransformableNode.LocalPosition = new Vector3(-1.2f, 0.45f, 0.4f);
+            transformableTextNodeCementSilo2.ScaleController.Enabled = false;
             transformableTextNodeCementSilo2.ScaleController.TransformableNode.LocalScale = new Vector3(1.0f, 1.0f, 0.0f);
             transformableTextNodeCementSilo2.SetParent(AnchorNode);
+
+            transformableTextNodeCementSilo3 = new TransformableNode(fragment.TransformationSystem);
+            transformableTextNodeCementSilo3.TranslationController.Enabled = true;
+            transformableTextNodeCementSilo3.TranslationController.TransformableNode.LocalPosition = new Vector3(-0.7f, 0.7f, -0.3f);
+            transformableTextNodeCementSilo3.ScaleController.Enabled = true;
+            transformableTextNodeCementSilo3.ScaleController.TransformableNode.LocalScale = new Vector3(1.0f, 1.0f, 0.0f);
+            transformableTextNodeCementSilo3.SetParent(AnchorNode);
 
 
             transformableTextNodeCementVrm = new TransformableNode(fragment.TransformationSystem);
             transformableTextNodeCementVrm.TranslationController.Enabled = true;
             transformableTextNodeCementVrm.TranslationController.TransformableNode.LocalPosition = new Vector3(1.0f, 0.5f, -0.6f);
-            transformableTextNodeCementVrm.ScaleController.Enabled = true;
+            transformableTextNodeCementVrm.ScaleController.Enabled = false;
             transformableTextNodeCementVrm.ScaleController.TransformableNode.LocalScale = new Vector3(1.0f, 1.0f, 0.0f);
             transformableTextNodeCementVrm.SetParent(AnchorNode);
         }
@@ -544,15 +555,20 @@ namespace NeudesicIC
                         var kilnMetricsText = "Asset: ap.039.001.kiln <br/>";
                         var silo1MetricsText = "Asset: ap.039.001.silo1 <br/>";
                         var silo2MetricsText = "Asset: ap.039.001.silo2 <br/>";
+                        var silo3MetricsText = "Asset: ap.039.001.silo3 <br/>";
                         var vrmMetricsText = "Asset: ap.039.001.vrm <br/>";
 
-                        bool kilnAnamoly = false, silo1Anamoly = false, silo2Anamoly = false, vrmAnamoly = false;
+
+                        bool kilnAnamoly = false, silo1Anamoly = false, silo2Anamoly = false, silo3Anamoly = false, vrmAnamoly = false;
+
+                        bool kilnMetricsFound= false, silo1MetricsFound = false, silo2MetricsFound = false, silo3MetricsFound = false, vrmMetricsFound = false;
                         foreach (var item in cementFactoriyTelementry)
                         {
                             var str = GetCementMetricsString(item.DeviceTelemetries);
                             if (item.Id.Contains("kiln"))
                             {
                                 kilnMetricsText += str.Item1;
+                                kilnMetricsFound = true;
                                 if (str.Item2)
                                 {
                                     kilnAnamoly = true;
@@ -561,7 +577,7 @@ namespace NeudesicIC
                             }
                             else if (item.Id.Contains("silo1"))
                             {
-
+                                silo1MetricsFound= true;
                                 silo1MetricsText += str.Item1;
                                 if (str.Item2)
                                 {
@@ -570,14 +586,25 @@ namespace NeudesicIC
                             }
                             else if (item.Id.Contains("silo2"))
                             {
+                                silo2MetricsFound= true;
                                 silo2MetricsText += str.Item1;
                                 if (str.Item2)
                                 {
                                     silo2Anamoly = true;
                                 }
                             }
+                            else if (item.Id.Contains("silo3"))
+                            {
+                                silo3MetricsFound = true;
+                                silo3MetricsText += str.Item1;
+                                if (str.Item2)
+                                {
+                                    silo3Anamoly = true;
+                                }
+                            }
                             else if (item.Id.Contains("vrm"))
                             {
+                                vrmMetricsFound = true;
                                 vrmMetricsText += str.Item1;
                                 if (str.Item2)
                                 {
@@ -590,12 +617,15 @@ namespace NeudesicIC
                         SetCementComponentsColor("kiln", Android.Graphics.Color.Red, kilnAnamoly);
                         SetCementComponentsColor("silo-1", Android.Graphics.Color.Red, silo1Anamoly);
                         SetCementComponentsColor("silo-2", Android.Graphics.Color.Red, silo2Anamoly);
+                        SetCementComponentsColor("silo-3", Android.Graphics.Color.Red, silo3Anamoly);
                         SetCementComponentsColor("vrm", Android.Graphics.Color.Red, vrmAnamoly);
-                        
-                        LoadCementTelemetryPopups(Html.FromHtml(kilnMetricsText), Resource.Layout.cementKilnTelemetry, transformableTextNodeCementKiln, kilnAnamoly, tnCementKilnGif);
-                        LoadCementTelemetryPopups(Html.FromHtml(silo1MetricsText), Resource.Layout.cementSilo1Telemetry, transformableTextNodeCementSilo1, silo1Anamoly, tnCementSilo1Gif);
-                        LoadCementTelemetryPopups(Html.FromHtml(silo2MetricsText), Resource.Layout.cementSilo2Telemetry, transformableTextNodeCementSilo2, silo2Anamoly, tnCementSilo2Gif);
-                        LoadCementTelemetryPopups(Html.FromHtml(vrmMetricsText), Resource.Layout.cementVrmTelemetry, transformableTextNodeCementVrm, vrmAnamoly, tnCementVrmGif);
+
+                      
+                        LoadCementTelemetryPopups(Html.FromHtml(kilnMetricsText), Resource.Layout.cementKilnTelemetry, transformableTextNodeCementKiln, kilnAnamoly,kilnMetricsFound, tnCementKilnGif);
+                        LoadCementTelemetryPopups(Html.FromHtml(silo1MetricsText), Resource.Layout.cementSilo1Telemetry, transformableTextNodeCementSilo1, silo1Anamoly,silo1MetricsFound, tnCementSilo1Gif);
+                        LoadCementTelemetryPopups(Html.FromHtml(silo2MetricsText), Resource.Layout.cementSilo2Telemetry, transformableTextNodeCementSilo2, silo2Anamoly,silo2MetricsFound, tnCementSilo2Gif);
+                        LoadCementTelemetryPopups(Html.FromHtml(silo3MetricsText), Resource.Layout.cementSilo3Telemetry, transformableTextNodeCementSilo3, silo3Anamoly,silo3MetricsFound, tnCementSilo2Gif);
+                        LoadCementTelemetryPopups(Html.FromHtml(vrmMetricsText), Resource.Layout.cementVrmTelemetry, transformableTextNodeCementVrm, vrmAnamoly,vrmMetricsFound, tnCementVrmGif);
                         IsModelLoaded = true;
                         
                         if (kilnAnamoly || silo1Anamoly || silo2Anamoly || vrmAnamoly)
@@ -653,12 +683,18 @@ namespace NeudesicIC
             {
                 if (deviceTelemetry.Status)
                 {
+                    //metrics += $"<tr style=\"color:red;border: 1px solid #fff\"><td style=\"color:red;border: 1px solid #fff\">{deviceTelemetry.Property}</td> <td style=\"color:red;border: 1px solid #fff\">{deviceTelemetry.Value} {deviceTelemetry.Unit}</td></tr>";
                     metrics += "<font color=\"Red\">" + deviceTelemetry.Property + ": " + deviceTelemetry.Value + " " + deviceTelemetry.Unit + "</font>" + "<br/>";
+                    //metrics += "<li><font color=\"Red\">" + deviceTelemetry.Property + ": " + deviceTelemetry.Value + " " + deviceTelemetry.Unit + "</font></li>" ;
+
                     anamolyFound = true;
                 }
                 else
                 {
+                    //metrics += "<li>" +deviceTelemetry.Property + ": " + deviceTelemetry.Value + " " + deviceTelemetry.Unit + "</li>";
+
                     metrics += deviceTelemetry.Property + ": " + deviceTelemetry.Value + " " + deviceTelemetry.Unit + "<br/>";
+                    //metrics += $"<tr style=\"color:red;border: 1px solid #fff\"><td style=\"color:red;border: 1px solid #fff\">{deviceTelemetry.Property}</td> <td style=\"color:red;border: 1px solid #fff\">{deviceTelemetry.Value} {deviceTelemetry.Unit}</td></tr>";
                 }
             }
             return (metrics, anamolyFound);
@@ -714,27 +750,30 @@ namespace NeudesicIC
             builder_F.Build(FinishLoadingText_F);
         }
 
-        private void LoadCementTelemetryPopups(ISpanned text, int androidResourceId, TransformableNode tn, bool anamolyFound, TransformableNode gifTranformableNode )
+        private void LoadCementTelemetryPopups(ISpanned text, int androidResourceId, TransformableNode tn, bool anamolyFound, bool metricFound, TransformableNode gifTranformableNode )
         {
-            if (!IsModelLoaded)
+            if (metricFound)
             {
-                var builder_D = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, androidResourceId);
-                builder_D.Build((ViewRenderable) => { FinishLoadingCementTelemetryPopups(ViewRenderable, text, tn); });
-            }
-            else
-            {
-                var renderableView = (ViewRenderable)tn.Renderable;
-                var textView = (TextView)renderableView.View;
-                textView.SetText(text, TextView.BufferType.Normal);
-            }
+                if (!IsModelLoaded)
+                {
+                    var builder_D = ViewRenderable.InvokeBuilder().SetView(this.fragment.Context, androidResourceId);
+                    builder_D.Build((ViewRenderable) => { FinishLoadingCementTelemetryPopups(ViewRenderable, text, tn); });
+                }
+                else
+                {
+                    var renderableView = (ViewRenderable)tn.Renderable;
+                    var textView = (TextView)renderableView.View;
+                    textView.SetText(text, TextView.BufferType.Normal);
+                }
 
-            if(anamolyFound)
-            {
-                LoadCementHazardGIF(gifTranformableNode);
-            }
-            else
-            {
-                UnLoadCementHazardGIF(gifTranformableNode);
+                if (anamolyFound)
+                {
+                    LoadCementHazardGIF(gifTranformableNode);
+                }
+                else
+                {
+                    UnLoadCementHazardGIF(gifTranformableNode);
+                }
             }
         }
 

@@ -4,12 +4,11 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:layout_weight="1"
-    android:textColor="@android:color/black"
-    android:gravity="center"
+    android:textColor="@android:color/white"
+    android:gravity="left"
     android:orientation="vertical"
-    android:padding="10dp"
+    android:padding="30dp"
     android:text=""
     android:singleLine="false" 
     android:maxLines="10" 
-    android:textAlignment="center"
-    android:background="@drawable/bubble_yellow"/>
+    android:background="@drawable/tooltip_right"/>

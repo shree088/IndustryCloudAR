@@ -134,7 +134,7 @@ namespace NeudesicIC
             visual.SetColor(arFragment.Context, Color.Yellow);
             visual.AddToScene(arFragment);
             visual.ModelLoaded += Visual_ModelLoaded;
-            hintText.SetText(Resource.String.hint_adjust_anchor);
+            hintText.SetText(Resource.String.wait_for_object_render);
             
 
         }
@@ -144,6 +144,7 @@ namespace NeudesicIC
 
             syncTelemetryButton.Enabled = true;
             arFragment.ArSceneView.PlaneRenderer.Enabled = false;
+            hintText.SetText(Resource.String.hint_adjust_anchor);
 
         }
 
