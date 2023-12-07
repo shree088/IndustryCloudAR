@@ -90,7 +90,6 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidAsset Include="Assets\oil.glb" />
-    <AndroidAsset Include="Assets\cementfactory.glb" />
     <AndroidAsset Include="Assets\cement.glb" />
     <None Include="Properties\AndroidManifest.xml" />
     <None Include="Assets\AboutAssets.txt" />

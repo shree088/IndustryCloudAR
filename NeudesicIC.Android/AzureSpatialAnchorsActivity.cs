@@ -70,7 +70,6 @@ namespace NeudesicIC
 
             this.arFragment = (ArFragment)this.SupportFragmentManager.FindFragmentById(Resource.Id.ar_fragment);
             this.arFragment.TapArPlane += (_, e) => this.OnTapArPlaneListener(e.HitResult, e.Plane, e.MotionEvent);
-
             this.sceneView = this.arFragment.ArSceneView;
 
             Scene scene = this.sceneView.Scene;

@@ -28,6 +28,7 @@ namespace NeudesicIC
         private RadioGroup shapeSelection;
         private LinearLayout selectLayout;
         private Timer timer;
+
         private AnchorVisual.NamedShape SelectedShape
         {
             get
@@ -72,6 +73,7 @@ namespace NeudesicIC
         public override void OnViewCreated(View view, Bundle savedInstanceState)
         {
             base.OnViewCreated(view, savedInstanceState);
+            arFragment.ArSceneView.PlaneRenderer.Enabled = true;
 
             hintText = view.FindViewById<TextView>(Resource.Id.hint_text);
             syncTelemetryButton = view.FindViewById<Button>(Resource.Id.confirm_placement);
@@ -133,14 +135,16 @@ namespace NeudesicIC
             visual.AddToScene(arFragment);
             visual.ModelLoaded += Visual_ModelLoaded;
             hintText.SetText(Resource.String.hint_adjust_anchor);
+            
 
         }
 
         private void Visual_ModelLoaded(object sender, bool e)
         {
-           
-                syncTelemetryButton.Enabled = true;
-           
+
+            syncTelemetryButton.Enabled = true;
+            arFragment.ArSceneView.PlaneRenderer.Enabled = false;
+
         }
 
         void IOnCheckedChangeListener.OnCheckedChanged(RadioGroup radioGroup, int selectedId)

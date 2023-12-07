@@ -634,10 +634,11 @@ namespace NeudesicIC
                     {
                         SetModelColor(this.fragment.Context, color, i);
                     }
-                    else if (AnchorVisual.originalMaterialCache.ContainsKey(i))
+                    else //if (AnchorVisual.originalMaterialCache.ContainsKey(i))
                     {
-                        this.transformableNode.Renderable.SetMaterial(i, AnchorVisual.originalMaterialCache[i]);
+                        //this.transformableNode.Renderable.SetMaterial(i, AnchorVisual.originalMaterialCache[i]);
                         AnchorVisual.originalMaterialCache.Remove(i);
+                        SetModelColor(this.fragment.Context, Android.Graphics.Color.Green, i);
                     }
                 }
             }
